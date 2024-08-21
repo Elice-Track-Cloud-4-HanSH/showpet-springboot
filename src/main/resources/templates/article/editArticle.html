@@ -20,6 +20,24 @@
       }
     </style>
     <title>게시글 수정</title>
+    <script>
+      function showPreviewImage(input) {
+        const preview = document.getElementById('preview')
+        if (input.files && input.files[0]) {
+          let reader = new FileReader();
+          reader.onload = (e) => {
+            preview.src = e.target.result;
+            preview.style.display = "block";
+            preview.style.maxWidth = "100%";
+            preview.style.maxHeight = "auto";
+          }
+          reader.readAsDataURL(input.files[0]);
+        } else {
+          preview.src = "#";
+          preview.style.display = "none";
+        }
+      }
+    </script>
   </head>
   <body>
     <div class="container my-5">
@@ -29,6 +47,7 @@
       <form
         th:action="@{/articles/edit/{articleId}(articleId=${article.id})}"
         method="post"
+        enctype="multipart/form-data"
       >
         <div class="mb-3">
           <label for="title">게시글 제목</label>
@@ -53,6 +72,31 @@
             th:text="${article.content}"
           ></textarea>
         </div>
+
+        <div class="mb-3">
+          <label for="fileInput">이미지 업로드</label>
+          <input
+                  type="file"
+                  class="form-control"
+                  id="fileInput"
+                  name="file"
+                  accept="image/*"
+                  onchange="showPreviewImage(this)"
+          />
+        </div>
+        <div class="mb-3">
+          <img
+                  id="preview"
+                  th:src="${article.image}"
+                  alt="미리보기 이미지"
+                  th:style="${
+                      article.image == null || article.image == ''
+                      ? 'display: none;'
+                      : 'display: block; max-width: 100%; height: auto;'
+                      }"
+          >
+        </div>
+
         <button type="submit" class="btn btn-primary">수정</button>
         <button
           type="button"

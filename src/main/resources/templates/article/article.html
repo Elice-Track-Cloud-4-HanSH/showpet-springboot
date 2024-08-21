@@ -50,6 +50,14 @@
           <h2 class="text-start" th:text="${article.title}">게시글 제목</h2>
         </div>
         <p class="m-0" th:text="${article.content}">게시글 내용</p>
+        <div th:if="${article.image != null && article.image != ''}" class="mt-4">
+          <img
+                  src="#"
+          alt="게시글 이미지"
+          class="img-fluid rounded"
+          th:src="@{${article.image}}"
+          />
+        </div>
         <hr class="mt-4" />
         <h4 class="mb-3">
           댓글
@@ -133,6 +141,14 @@
             <li>
               <button
                 class="dropdown-item d-flex align-items-center gap-2"
+                th:onclick="'location.href=\'/articles/add\''"
+              >
+                <span class="material-symbols-outlined"> article </span>작성
+              </button>
+            </li>
+            <li>
+              <button
+                class="dropdown-item d-flex align-items-center gap-2"
                 th:onclick="'location.href=\'/articles/edit/' + ${article.id} + '\''"
               >
                 <span class="material-symbols-outlined"> edit </span>수정
@@ -142,8 +158,8 @@
               <button
                 class="dropdown-item text-danger btn btn-danger d-flex align-items-center gap-2"
                 data-bs-toggle="modal"
-                data-bs-target="#deletePostModal"
-
+                data-bs-target="#deleteArticleModal"
+                th:onclick="handleDeleteArticleButton(event, [[${article.id}]]);"
               >
                 <span class="material-symbols-outlined"> delete </span>삭제
               </button>
@@ -155,15 +171,15 @@
 
     <div
       class="modal fade"
-      id="deletePostModal"
+      id="deleteArticleModal"
       tabindex="-1"
-      aria-labelledby="deletePostModalLabel"
+      aria-labelledby="deleteArticleModalLabel"
       aria-hidden="true"
     >
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h1 class="modal-title fs-5" id="deletePostModalLabel">
+            <h1 class="modal-title fs-5" id="deleteArticleModalLabel">
               게시글을 삭제하시겠습니까?
             </h1>
             <button
@@ -187,7 +203,7 @@
             <button
               type="button"
               class="btn btn-danger"
-              onclick="handleDeletePostModalButton()"
+              onclick="handleDeleteArticleModalButton()"
             >
               삭제
             </button>
@@ -290,18 +306,27 @@
       crossorigin="anonymous"
     ></script>
     <script th:inline="javascript">
-      let currentPost;
+      let currentPArticle;
       let currentBoard;
       let currentComment;
       let elementToDelete;
 
-      function handleDeletePostButton(_, postId, boardId) {
-        currentPost = postId;
+      function handleDeleteArticleButton(_, postId) {
+        currentArticle = postId;
+      }
+
+      function handleDeleteArticleButton(_, postId, boardId) {
+        currentArticle = postId;
         currentBoard = boardId;
       }
 
-      function handleDeletePostModalButton() {
-        fetch(`/posts/${currentPost}`, {
+      function handleCreateArticleButton() {
+
+      }
+
+      function handleDeleteArticleModalButton() {
+        currentBoard = 1;
+        fetch(`/articles/${currentArticle}`, {
           method: "DELETE",
         }).then(() => (window.location.href = `/boards/${currentBoard}`));
       }

@@ -3,7 +3,7 @@ package com.elice.showpet.article.controller;
 import com.elice.showpet.article.entity.CreateArticleDto;
 import com.elice.showpet.article.entity.ResponseArticleDto;
 import com.elice.showpet.article.entity.UpdateArticleDto;
-import com.elice.showpet.article.service.ArticleService;
+import com.elice.showpet.article.service.ArticleRestService;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,23 +16,23 @@ import java.util.List;
 @NoArgsConstructor
 @RequestMapping("/api/articles")
 public class ArticleRestController {
-  private ArticleService articleService;
+  private ArticleRestService articleRestService;
 
   @Autowired
-  public ArticleRestController(ArticleService articleService) {
-    this.articleService = articleService;
+  public ArticleRestController(ArticleRestService articleRestService) {
+    this.articleRestService = articleRestService;
   }
 
   @GetMapping
   public ResponseEntity<List<ResponseArticleDto>> getArticles() {
-    List<ResponseArticleDto> result = articleService.getAllArticles();
+    List<ResponseArticleDto> result = articleRestService.getAllArticles();
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
   @GetMapping("/{id}")
   public ResponseEntity<ResponseArticleDto> getArticle(@PathVariable("id") Long id) {
     try {
-      ResponseArticleDto responseDto = articleService.getArticle(id);
+      ResponseArticleDto responseDto = articleRestService.getArticle(id);
       return new ResponseEntity<>(responseDto, HttpStatus.OK);
     } catch (Exception e) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -41,7 +41,7 @@ public class ArticleRestController {
 
   @PostMapping
   public ResponseEntity<ResponseArticleDto> createArticle(@RequestBody CreateArticleDto requestArticleDto) {
-    ResponseArticleDto responseDto = articleService.createArticle(requestArticleDto);
+    ResponseArticleDto responseDto = articleRestService.createArticle(requestArticleDto);
     return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
   }
 
@@ -51,7 +51,7 @@ public class ArticleRestController {
     @RequestBody UpdateArticleDto updateArticleDto
   ) {
     try {
-      ResponseArticleDto responseDto = articleService.updateArticle(id, updateArticleDto);
+      ResponseArticleDto responseDto = articleRestService.updateArticle(id, updateArticleDto);
       return new ResponseEntity<>(responseDto, HttpStatus.OK);
     } catch (Exception e) {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -61,7 +61,7 @@ public class ArticleRestController {
   @DeleteMapping("/{id}")
   public ResponseEntity<ResponseArticleDto> deleteArticle(@PathVariable("id") Long id) {
     try {
-      articleService.deleteArticle(id);
+      articleRestService.deleteArticle(id);
       return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     } catch (Exception e) {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

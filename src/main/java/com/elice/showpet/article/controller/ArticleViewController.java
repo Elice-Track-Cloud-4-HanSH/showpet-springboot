@@ -1,10 +1,7 @@
 package com.elice.showpet.article.controller;
 
-import com.elice.showpet.article.entity.CreateArticleDto;
-import com.elice.showpet.article.entity.ResponseArticleDto;
-import com.elice.showpet.article.entity.ResponseArticleWithBase64ImageDto;
-import com.elice.showpet.article.entity.UpdateArticleDto;
-import com.elice.showpet.article.service.ArticleService;
+import com.elice.showpet.article.entity.*;
+import com.elice.showpet.article.service.ArticleViewService;
 import com.elice.showpet.utils.Base64Codec;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,16 +19,16 @@ import java.util.List;
 @NoArgsConstructor
 @RequestMapping("/articles")
 public class ArticleViewController {
-  private ArticleService articleService;
+  private ArticleViewService articleViewService;
 
   @Autowired
-  public ArticleViewController(ArticleService articleService) {
-    this.articleService = articleService;
+  public ArticleViewController(ArticleViewService articleViewService) {
+    this.articleViewService = articleViewService;
   }
 
   @GetMapping
   public String getArticles(Model model) {
-    List<ResponseArticleDto> articles = articleService.getAllArticles();
+    List<Article> articles = articleViewService.getAllArticles();
 
     return "article/article";
   }
@@ -39,14 +36,25 @@ public class ArticleViewController {
   @GetMapping("/{id}")
   public String getArticle(@PathVariable Long id, Model model) {
     try {
-      ResponseArticleDto article = articleService.getArticle(id);
-      ResponseArticleWithBase64ImageDto dto = new ResponseArticleWithBase64ImageDto(article);
-      model.addAttribute("article", dto);
-      model.addAttribute("comments", new ArrayList<>());
+      Article article = articleViewService.getArticle(id);
+      article.setImage(parseImage(article.getImage()));
+      model.addAttribute("article", article);
+      model.addAttribute("comments", new ArrayList<String>());
       return "article/article";
     } catch (Exception e) {
       return "error";
     }
+  }
+
+  private String parseImage(String image) {
+    try {
+      if (image == null || image.isEmpty()) throw new Exception();
+      String[] imageInfo = image.split(","); // image[0] : mimeType, image[1] : base64 data
+      image = "data:" + imageInfo[0] + ";base64," + imageInfo[1];
+    } catch (Exception e) {
+      image = null;
+    }
+    return image;
   }
 
   @GetMapping("/add")
@@ -65,17 +73,17 @@ public class ArticleViewController {
       String mimeType = file.getContentType();
       articleDto.setImage(mimeType + "," + base64EncodedFile);
     }
-    ResponseArticleDto responseDto = articleService.createArticle(articleDto);
-    redirectAttributes.addAttribute("id", responseDto.getId());
+    Article article = articleViewService.createArticle(articleDto);
+    redirectAttributes.addAttribute("id", article.getId());
     return "redirect:/articles/{id}";
   }
 
   @GetMapping("/edit/{id}")
   public String editArticleForm(@PathVariable Long id, Model model) {
     try {
-      ResponseArticleDto responseDto = articleService.getArticle(id);
-      ResponseArticleWithBase64ImageDto dto = new ResponseArticleWithBase64ImageDto(responseDto);
-      model.addAttribute("article", dto);
+      Article article = articleViewService.getArticle(id);
+      article.setImage(parseImage(article.getImage()));
+      model.addAttribute("article", article);
       return "article/editArticle";
     } catch (Exception e) {
       return "error";
@@ -95,9 +103,9 @@ public class ArticleViewController {
         String mimeType = file.getContentType();
         articleDto.setImage(mimeType + "," + base64EncodedFile);
       }
-      ResponseArticleDto responseDto = articleService.updateArticle(id, articleDto);
+      Article article = articleViewService.updateArticle(id, articleDto);
 
-      redirectAttributes.addAttribute("id", responseDto.getId());
+      redirectAttributes.addAttribute("id", article.getId());
       redirectAttributes.addFlashAttribute("message", "게시글이 수정되었습니다.");
       return "redirect:/articles/{id}";
     } catch (Exception e) {
@@ -111,7 +119,7 @@ public class ArticleViewController {
     RedirectAttributes redirectAttributes
   ) {
     try {
-      articleService.deleteArticle(id);
+      articleViewService.deleteArticle(id);
       return "redirect:/articles";
     } catch (Exception e) {
       return "error";

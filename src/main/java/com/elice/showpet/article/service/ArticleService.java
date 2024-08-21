@@ -5,66 +5,61 @@ import com.elice.showpet.article.entity.CreateArticleDto;
 import com.elice.showpet.article.entity.ResponseArticleDto;
 import com.elice.showpet.article.entity.UpdateArticleDto;
 import com.elice.showpet.article.mapper.ArticleMapper;
+import com.elice.showpet.article.repository.ArticleJdbcTemplateRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class ArticleService {
-  private final List<Article> articles = new ArrayList<>();
   private final ArticleMapper articleMapper;
 
+  private final ArticleJdbcTemplateRepository articleRepository;
+
   @Autowired
-  public ArticleService(ArticleMapper articleMapper) {
+  public ArticleService(
+    ArticleMapper articleMapper,
+    ArticleJdbcTemplateRepository articleRepository
+  ) {
     this.articleMapper = articleMapper;
-    for (int i = 0; i < 4; i++) {
-      Article article = Article.builder()
-        .id((long) (i + 1))
-        .title("qwer")
-        .content("asdf")
-        .createdAt(LocalDateTime.now())
-        .updatedAt(LocalDateTime.now())
-        .build();
-      articles.add(article);
-    }
+    this.articleRepository = articleRepository;
   }
 
   public List<ResponseArticleDto> getAllArticles() {
+    List<Article> articles = articleRepository.findAll();
     return articles.stream().map(articleMapper::toResponseDto).collect(Collectors.toList());
   }
 
   public ResponseArticleDto getArticle(Long id) throws Exception {
-    Article result = articles.stream().filter(article -> article.getId().equals(id)).findFirst().orElse(null);
-    if (result == null) throw new Exception("해당하는 게시글이 존재하지 않습니다.");
-    return articleMapper.toResponseDto(result);
+    Article article = articleRepository.findById(id).orElseThrow(() -> new Exception("Article not found"));
+    return articleMapper.toResponseDto(article);
   }
 
   public ResponseArticleDto createArticle(CreateArticleDto articleDto) {
     Article created = articleMapper.toEntity(articleDto);
-    created.setId(articles.getLast().getId()+1);
-    created.setCreatedAt(LocalDateTime.now());
-    created.setUpdatedAt(LocalDateTime.now());
-    articles.add(created);
-    return articleMapper.toResponseDto(created);
+    Article result = articleRepository.save(created);
+    return articleMapper.toResponseDto(result);
   }
 
   public ResponseArticleDto updateArticle(Long id, UpdateArticleDto articleDto) throws Exception {
-    Article target = articles.stream().filter(article -> article.getId().equals(id)).findFirst().orElse(null);
-    if (target == null) throw new Exception("해당하는 게시글이 존재하지 않습니다.");
+    Article findArticle = articleRepository.findById(id).orElseThrow(() -> new Exception("Article not found"));
 
-    if (articleDto.getTitle() != null) { target.setTitle(articleDto.getTitle()); }
-    if (articleDto.getContent() != null) { target.setContent(articleDto.getContent()); }
-    if (articleDto.getImage() != null) { target.setImage(articleDto.getImage()); }
-    return articleMapper.toResponseDto(target);
+    Optional.ofNullable(articleDto.getTitle())
+      .ifPresent(findArticle::setTitle);
+    Optional.ofNullable(articleDto.getContent())
+      .ifPresent(findArticle::setContent);
+    Optional.ofNullable(articleDto.getImage())
+      .ifPresent(findArticle::setImage);
+
+    Article updated = articleRepository.save(findArticle);
+    return articleMapper.toResponseDto(updated);
   }
 
   public void deleteArticle(Long id) throws Exception {
-    Article target = articles.stream().filter(article -> article.getId().equals(id)).findFirst().orElse(null);
-    if (target == null) throw new Exception("해당하는 게시글이 존재하지 않습니다.");
-    articles.remove(target);
+    Article article = articleRepository.findById(id).orElseThrow(() -> new Exception("Article not found"));
+    articleRepository.delete(article);
   }
 }

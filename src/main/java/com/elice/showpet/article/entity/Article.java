@@ -32,6 +32,7 @@ public class Article {
   @Column(nullable = false, length = 10000)
   private String content;
 
+  @Column(length = 1000000)
   private String image;
 
   @CreatedDate
@@ -41,7 +42,7 @@ public class Article {
   private LocalDateTime updatedAt;
 
   @ManyToOne
-  @JoinColumn(nullable = false, name = "userId")
+  @JoinColumn(name = "userId")
   @ToString.Exclude
   private Member member;
 

@@ -9,9 +9,9 @@ public interface JdbcTemplateRepository {
 
   List<Article> findAll();
 
-  Optional<Article> findById(Long subjectId);
+  Optional<Article> findById(Long id);
 
-  Article save(Article subject);
+  Article save(Article article);
 
-  void delete(Article subject);
+  void delete(Article article);
 }

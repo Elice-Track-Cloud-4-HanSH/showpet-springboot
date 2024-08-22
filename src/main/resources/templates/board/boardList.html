@@ -51,7 +51,7 @@
         <h1 class="text-center">게시판 목록</h1>
       </div>
       <div class="d-flex justify-content-end mb-3">
-        <button th:onclick="|location.href='@{/category/create}'|" class="btn btn-primary">게시판 추가</button>
+        <button th:onclick="|location.href='@{/category/new}'|" class="btn btn-primary">게시판 추가</button>
       </div>
       <div class="container p-0">
         <div class="row row-cols-3 position-relative">
@@ -65,16 +65,16 @@
               onmouseover="event.currentTarget.classList.add('shadow')"
               onmouseleave="event.currentTarget.classList.remove('shadow')"
             >
-<!--              <a-->
-<!--                class="board-item pe-auto p-3 link-underline link-underline-opacity-0 d-flex"-->
-<!--                th:href="@{/category/{id}(id=${item.id})}"-->
-<!--              >-->
+              <a class="board-item pe-auto p-3 link-underline link-underline-opacity-0 d-flex" th:href="@{/category/{id}(id=${item.id})}">
                 <img
                   class="img-thumbnail w-50 h-50 me-3"
                   src="hellobit.png"
                   alt="hellobit"
                 />
                 <div>
+                    <div class="px-6 py-4 bg-gray-50 border-b border-gray-100">
+                        <span class="text-sm text-blue-500 font-semibold" th:text="${'#' + item.id}"></span>
+                    </div>
                   <h4
                     class="card-title fw-bold text-dark"
                     th:text="${item.title}"
@@ -87,22 +87,21 @@
                     >게시판 설명</span
                   >
                 </div>
-                <div
-                  class="position-absolute end-0 bottom-0 mb-3 me-3 btn-group bg-white bg-opacity-75"
-                  role="group"
-                  aria-label="edit-delete"
-                >
-                  <button
-                    class="btn btn-outline-primary lh-1"
-                    th:onclick="'event.preventDefault(); location.href=\'/category' + '/edit\''"
-                  >
+              </a>
+
+
+                <div class="position-absolute end-0 bottom-0 mb-3 me-3 btn-group bg-white bg-opacity-75" role="group" aria-label="edit-delete">
+                  <button class="btn btn-outline-primary lh-1"
+                    th:onclick="|location.href='@{/category/new?id={categoryId}(categoryId=${item.id})}'|">
                     <span class="material-symbols-outlined"> edit </span>
                   </button>
-                  <button type="button" id="delete-btn" class="btn btn-outline-danger lh-1">
+                  <button class="btn btn-outline-danger lh-1"
+                          data-bs-toggle="modal"
+                          data-bs-target="deleteModal"
+                          th:onclick="handleDeleteButton(event, [${item.id}]);">
                     <span class="material-symbols-outlined"> delete </span>
                   </button>
                 </div>
-              </a>
             </div>
           </div>
         </div>
@@ -114,49 +113,48 @@
       </div>
     </div>
 
-<!--    <div-->
-<!--      class="modal fade"-->
-<!--      id="deleteModal"-->
-<!--      tabindex="-1"-->
-<!--      aria-labelledby="deleteModalLabel"-->
-<!--      aria-hidden="true"-->
-<!--    >-->
-<!--      <div class="modal-dialog">-->
-<!--        <div class="modal-content">-->
-<!--          <div class="modal-header">-->
-<!--            <h1 class="modal-title fs-5" id="deleteModalLabel">-->
-<!--              게시판을 삭제하시겠습니까?-->
-<!--            </h1>-->
-<!--            <button-->
-<!--              type="button"-->
-<!--              class="btn-close"-->
-<!--              data-bs-dismiss="modal"-->
-<!--              aria-label="Close"-->
-<!--            ></button>-->
-<!--          </div>-->
-<!--          <div class="modal-body">-->
-<!--            <p class="fw-light">게시판에 포함된 모든 게시글이 삭제됩니다.</p>-->
-<!--          </div>-->
-<!--          <div class="modal-footer">-->
-<!--            <button-->
-<!--              type="button"-->
-<!--              class="btn btn-secondary"-->
-<!--              data-bs-dismiss="modal"-->
-<!--            >-->
-<!--              취소-->
-<!--            </button>-->
-<!--            <button-->
-<!--              type="button"-->
-<!--              id="delete-btn"-->
-<!--              class="btn btn-danger"-->
-<!--              onclick="handleDeleteModalButton()"-->
-<!--            >-->
-<!--              삭제-->
-<!--            </button>-->
-<!--          </div>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--    </div>-->
+    <div
+      class="modal fade"
+      id="deleteModal"
+      tabindex="-1"
+      aria-labelledby="deleteModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="deleteModalLabel">
+              게시판을 삭제하시겠습니까?
+            </h1>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <p class="fw-light">게시판에 포함된 모든 게시글이 삭제됩니다.</p>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              취소
+            </button>
+            <button
+              type="button"
+              id="delete-btn"
+              class="btn btn-danger"
+              onclick="handleDeleteModalButton()"
+            >
+              삭제
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- 부트스트랩 JS 추가 -->
     <script src="/js/category.js"></script>

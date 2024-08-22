@@ -30,29 +30,26 @@ public class CategoryViewController {
         return "board/boardList";
     }
 
-    @GetMapping("/category/{id}")
-    public String getArticle(@PathVariable("id") long id, Model model) {
-        Category category = categoryService.findById(id);
-        model.addAttribute("article", new CategoryViewResponse(category));
-        return "board/board";
-    }
+//    @GetMapping("/category/{id}")
+//    public String getArticle(@PathVariable("id") long id, Model model) {
+//        Category category = categoryService.findById(id);
+//        model.addAttribute("article", new CategoryViewResponse(category));
+//        return "board/board";
+//    }
 
-    @GetMapping("/category/create")
+    @GetMapping("/category/new")
     public String newCategory(@RequestParam(required = false, name = "id") Long id, Model model) {
         if(id == null) { // id가 없으면 새롭게 블로그를 만든다.
             model.addAttribute("category", new CategoryViewResponse());
-
         }
         return "board/createBoard";
-
     }
 
-    @GetMapping("/category/edit")
+    @GetMapping("/category/new/{id}")
     public String editCategory(@RequestParam(required = false, name = "id") Long id, Model model) {
-        if (id != null) { // id가 있으면 수정하는 것으로 바꾼다.
+        if (id != null) {
             Category category = categoryService.findById(id);
             model.addAttribute("category", new CategoryViewResponse(category));
-
         }
         return "board/editBoard";
     }

@@ -27,28 +27,29 @@
         <h1 class="text-center">게시판 수정</h1>
       </div>
       <article>
+        <input type="hidden" id="category-id" th:value="${category.id}">
         <div class="mb-3">
-          <label for="name">게시판 이름</label>
+          <label for="title">게시판 이름</label>
           <input
             type="text"
             class="form-control"
-            id="name"
+            id="title"
             name="name"
             maxlength="20"
             placeholder="게시판 이름 입력 (최대 20자)"
             required
-            th:value="${category.name}"
+            th:value="${category.title}"
           />
         </div>
         <div class="mb-3">
-          <label for="description">게시판 설명</label>
+          <label for="content">게시판 설명</label>
           <textarea
             class="form-control"
-            id="description"
+            id="content"
             name="description"
             maxlength="200"
             placeholder="게시판 설명 입력 (최대 200자)"
-            th:text="${category.description}"
+            th:text="${category.content}"
           ></textarea>
         </div>
         <button type="submit" class="btn btn-primary">게시판 수정</button>

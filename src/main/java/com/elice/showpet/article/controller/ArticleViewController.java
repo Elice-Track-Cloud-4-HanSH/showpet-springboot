@@ -2,7 +2,7 @@ package com.elice.showpet.article.controller;
 
 import com.elice.showpet.article.entity.*;
 import com.elice.showpet.article.service.ArticleViewService;
-import com.elice.showpet.utils.Base64Codec;
+import com.elice.showpet.aws.s3.service.S3BucketService;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -14,16 +14,19 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Controller
 @NoArgsConstructor
 @RequestMapping("/articles")
 public class ArticleViewController {
   private ArticleViewService articleViewService;
+  private S3BucketService s3BucketService;
 
   @Autowired
-  public ArticleViewController(ArticleViewService articleViewService) {
+  public ArticleViewController(ArticleViewService articleViewService, S3BucketService s3Service) {
     this.articleViewService = articleViewService;
+    this.s3BucketService = s3Service;
   }
 
   @GetMapping
@@ -37,24 +40,12 @@ public class ArticleViewController {
   public String getArticle(@PathVariable Long id, Model model) {
     try {
       Article article = articleViewService.getArticle(id);
-      article.setImage(parseImage(article.getImage()));
       model.addAttribute("article", article);
       model.addAttribute("comments", new ArrayList<String>());
       return "article/article";
     } catch (Exception e) {
       return "error";
     }
-  }
-
-  private String parseImage(String image) {
-    try {
-      if (image == null || image.isEmpty()) throw new Exception();
-      String[] imageInfo = image.split(","); // image[0] : mimeType, image[1] : base64 data
-      image = "data:" + imageInfo[0] + ";base64," + imageInfo[1];
-    } catch (Exception e) {
-      image = null;
-    }
-    return image;
   }
 
   @GetMapping("/add")
@@ -67,22 +58,28 @@ public class ArticleViewController {
     @ModelAttribute CreateArticleDto articleDto,
     @RequestParam("file") MultipartFile file,
     RedirectAttributes redirectAttributes
-  ) throws IOException {
-    if (!file.getContentType().startsWith("application")) {
-      String base64EncodedFile = Base64Codec.encode(file);
-      String mimeType = file.getContentType();
-      articleDto.setImage(mimeType + "," + base64EncodedFile);
+  ) {
+    try {
+      if (Objects.requireNonNull(file.getContentType()).startsWith("image")) {
+        String imageUrl = s3BucketService.uploadFile(file);
+        articleDto.setImage(imageUrl);
+      }
+      Article article = articleViewService.createArticle(articleDto);
+      redirectAttributes.addAttribute("id", article.getId());
+      return "redirect:/articles/{id}";
+    } catch (IOException e) {
+      return "redirect:/articles/add";
     }
-    Article article = articleViewService.createArticle(articleDto);
-    redirectAttributes.addAttribute("id", article.getId());
-    return "redirect:/articles/{id}";
   }
 
   @GetMapping("/edit/{id}")
-  public String editArticleForm(@PathVariable Long id, Model model) {
+  public String editArticleForm(
+    @PathVariable Long id,
+    Model model
+  ) {
     try {
       Article article = articleViewService.getArticle(id);
-      article.setImage(parseImage(article.getImage()));
+      article.setImage(article.getImage());
       model.addAttribute("article", article);
       return "article/editArticle";
     } catch (Exception e) {
@@ -98,10 +95,9 @@ public class ArticleViewController {
     RedirectAttributes redirectAttributes
   ) {
     try {
-      if (!file.getContentType().startsWith("application")) {
-        String base64EncodedFile = Base64Codec.encode(file);
-        String mimeType = file.getContentType();
-        articleDto.setImage(mimeType + "," + base64EncodedFile);
+      if (Objects.requireNonNull(file.getContentType()).startsWith("image")) {
+        String imageUrl = s3BucketService.uploadFile(file);
+        articleDto.setImage(imageUrl);
       }
       Article article = articleViewService.updateArticle(id, articleDto);
 
@@ -109,7 +105,7 @@ public class ArticleViewController {
       redirectAttributes.addFlashAttribute("message", "게시글이 수정되었습니다.");
       return "redirect:/articles/{id}";
     } catch (Exception e) {
-      return "error";
+      return "redirect:/articles/edit/{id}";
     }
   }
 
@@ -120,7 +116,7 @@ public class ArticleViewController {
   ) {
     try {
       articleViewService.deleteArticle(id);
-      return "redirect:/articles";
+      return "redirect:/boards";
     } catch (Exception e) {
       return "error";
     }

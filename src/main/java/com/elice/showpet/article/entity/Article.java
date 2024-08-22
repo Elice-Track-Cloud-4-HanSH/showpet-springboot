@@ -32,7 +32,7 @@ public class Article {
   @Column(nullable = false, length = 10000)
   private String content;
 
-  @Column(length = 1000000)
+  @Column(length = 1000)
   private String image;
 
   @CreatedDate

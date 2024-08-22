@@ -4,7 +4,6 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.jpa.repository.Meta;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,11 +19,9 @@ public class S3BucketService {
   @Value("${aws.s3.bucket.name}")
   private String bucketName;
 
-  private final String bucketPath = "https://showpet.s3.ap-northeast-2.amazonaws.com";
-
   public String uploadFile(MultipartFile file) throws IOException {
     String fileName = makeHashedFileName(file);
-    String fileUrl = bucketPath + "/" + fileName;
+    String fileUrl = "https://showpet.s3.ap-northeast-2.amazonaws.com/" + fileName;
     ObjectMetadata metadata =  createFileMetadata(file);
     try {
       s3Client.putObject(bucketName, fileName, file.getInputStream(), metadata);
@@ -32,6 +29,10 @@ public class S3BucketService {
     } catch (IOException e) {
       throw new IOException(e.getMessage());
     }
+  }
+
+  public void deleteFile(String fileName) {
+    s3Client.deleteObject(bucketName, fileName);
   }
 
   private String makeHashedFileName(MultipartFile file) {

@@ -4,10 +4,7 @@ import com.elice.showpet.aws.s3.service.S3BucketService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -27,5 +24,11 @@ public class S3BucketController {
       e.printStackTrace();
       return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
+  }
+
+  @DeleteMapping("/{filename}")
+  public ResponseEntity<String> deleteBucket(@PathVariable("filename") String filename) {
+    s3BucketService.deleteFile(filename);
+    return new ResponseEntity<>("Hello World!", HttpStatus.OK);
   }
 }

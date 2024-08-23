@@ -29,13 +29,6 @@ public class ArticleViewController {
     this.s3BucketService = s3Service;
   }
 
-  @GetMapping
-  public String getArticles(Model model) {
-    List<Article> articles = articleViewService.getAllArticles();
-
-    return "article/article";
-  }
-
   @GetMapping("/{id}")
   public String getArticle(@PathVariable Long id, Model model) {
     try {

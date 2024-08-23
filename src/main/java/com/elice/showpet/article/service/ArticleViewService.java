@@ -45,7 +45,7 @@ public class ArticleViewService {
   }
 
   public Article updateArticle(Long id, UpdateArticleDto articleDto) throws Exception {
-    Article findArticle = articleRepository.findById(id).orElseThrow(() -> new Exception("Article not found"));
+    Article findArticle = getArticle(id);
 
     Optional.ofNullable(articleDto.getTitle())
       .ifPresent(findArticle::setTitle);
@@ -61,7 +61,7 @@ public class ArticleViewService {
   }
 
   public void deleteArticle(Long id) throws Exception {
-    Article article = articleRepository.findById(id).orElseThrow(() -> new Exception("Article not found"));
+    Article article = getArticle(id);
     articleRepository.delete(article);
   }
 }

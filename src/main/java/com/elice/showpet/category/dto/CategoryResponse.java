@@ -1,6 +1,6 @@
 package com.elice.showpet.category.dto;
 
-import com.elice.showpet.category.domain.Category;
+import com.elice.showpet.category.entity.Category;
 import lombok.Getter;
 
 @Getter

@@ -1,7 +1,7 @@
 package com.elice.showpet.category.controller;
 
 
-import com.elice.showpet.category.domain.Category;
+import com.elice.showpet.category.entity.Category;
 import com.elice.showpet.category.dto.AddCategoryRequest;
 import com.elice.showpet.category.dto.CategoryResponse;
 import com.elice.showpet.category.dto.UpdateCategoryRequest;

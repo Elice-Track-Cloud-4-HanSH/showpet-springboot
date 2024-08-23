@@ -66,6 +66,7 @@
               onmouseleave="event.currentTarget.classList.remove('shadow')"
             >
               <a class="board-item pe-auto p-3 link-underline link-underline-opacity-0 d-flex" th:href="@{/category/{id}(id=${item.id})}">
+
                 <img
                   class="img-thumbnail w-50 h-50 me-3"
                   src="hellobit.png"
@@ -75,6 +76,7 @@
                     <div class="px-6 py-4 bg-gray-50 border-b border-gray-100">
                         <span class="text-sm text-blue-500 font-semibold" th:text="${'#' + item.id}"></span>
                     </div>
+                  <input type="hidden" id="category-id" th:value="${item.id}">
                   <h4
                     class="card-title fw-bold text-dark"
                     th:text="${item.title}"
@@ -92,7 +94,7 @@
 
                 <div class="position-absolute end-0 bottom-0 mb-3 me-3 btn-group bg-white bg-opacity-75" role="group" aria-label="edit-delete">
                   <button class="btn btn-outline-primary lh-1"
-                    th:onclick="|location.href='@{/category/new?id={categoryId}(categoryId=${item.id})}'|">
+                    th:onclick="|location.href='@{/category/edit/{categoryId}(categoryId=${item.id})}'|">
                     <span class="material-symbols-outlined"> edit </span>
                   </button>
                   <button class="btn btn-outline-danger lh-1"

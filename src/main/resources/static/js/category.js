@@ -14,6 +14,16 @@ if (deleteButton) {
     });
 }
 
+function handleDeleteButton(event, id)  {
+    fetch('/api/category/${id}/delete', {
+                method: 'DELETE'
+            })
+                .then(() => {
+                    alert('삭제가 완료되었습니다.');
+                    location.replace('/category');
+                });
+    }
+
 // 수정 기능
 const modifyButton = document.getElementById('modify-btn');
 

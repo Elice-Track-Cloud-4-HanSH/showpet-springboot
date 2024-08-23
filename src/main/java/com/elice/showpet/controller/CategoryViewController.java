@@ -45,7 +45,7 @@ public class CategoryViewController {
         return "board/createBoard";
     }
 
-    @GetMapping("/category/new/{id}")
+    @GetMapping("/category/edit/{id}")
     public String editCategory(@RequestParam(required = false, name = "id") Long id, Model model) {
         if (id != null) {
             Category category = categoryService.findById(id);

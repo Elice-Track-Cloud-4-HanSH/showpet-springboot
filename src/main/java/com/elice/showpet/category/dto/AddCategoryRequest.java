@@ -14,11 +14,13 @@ import lombok.Setter;
 public class AddCategoryRequest {
     private String title;
     private String content;
+    private String image;
 
     public Category toEntity() {
         return Category.builder()
                 .title(title)
                 .content(content)
+                .image(image)
                 .build();
     }
 }

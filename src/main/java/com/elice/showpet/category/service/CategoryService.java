@@ -1,5 +1,6 @@
 package com.elice.showpet.category.service;
 
+import com.elice.showpet.aws.s3.service.S3BucketService;
 import com.elice.showpet.category.entity.Category;
 import com.elice.showpet.category.dto.AddCategoryRequest;
 import com.elice.showpet.category.dto.UpdateCategoryRequest;
@@ -9,12 +10,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final S3BucketService s3BucketService;
 
 
     public Category save(AddCategoryRequest request) {
@@ -39,6 +42,15 @@ public class CategoryService {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("not found : " + id));
 
+        Optional.ofNullable(request.getTitle())
+                .ifPresent(category::setTitle);
+        Optional.ofNullable(request.getContent())
+                .ifPresent(category::setContent);
+        Optional.ofNullable(request.getImage())
+                .ifPresent((image) -> {
+                    s3BucketService.deleteFile(category.getImage().replace("https://showpet.s3.ap-northeast-2.amazonaws.com/", ""));
+                    category.setImage(image);
+                });
         category.update(request.getTitle(), request.getContent());
 
         return category;

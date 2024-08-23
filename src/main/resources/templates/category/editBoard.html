@@ -20,13 +20,31 @@
       }
     </style>
     <title>게시판 수정</title>
+    <script>
+      function showPreviewImage(input) {
+        const preview = document.getElementById('preview')
+        if (input.files && input.files[0]) {
+          let reader = new FileReader();
+          reader.onload = (e) => {
+            preview.src = e.target.result;
+            preview.style.display = "block";
+            preview.style.maxWidth = "100%";
+            preview.style.maxHeight = "auto";
+          }
+          reader.readAsDataURL(input.files[0]);
+        } else {
+          preview.src = "#";
+          preview.style.display = "none";
+        }
+      }
+    </script>
   </head>
   <body>
     <div class="container my-5">
       <div class="header mb-5">
         <h1 class="text-center">게시판 수정</h1>
       </div>
-      <form th:action="@{/category/edit/{categoryId}(categoryId=${category.id})}" method="post">
+      <form th:action="@{/category/edit/{categoryId}(categoryId=${category.id})}" method="post" enctype="multipart/form-data">
         <div class="mb-3">
           <label for="title">게시판 이름</label>
           <input
@@ -43,6 +61,29 @@
         <div class="mb-3">
           <label for="content">게시판 설명</label>
           <textarea class="form-control" id="content" name="content" maxlength="200" placeholder="게시판 설명 입력 (최대 200자)" th:text="${category.content}"></textarea>
+        </div>
+        <div class="mb-3">
+          <label for="fileInput">이미지 업로드</label>
+          <input
+                  type="file"
+                  class="form-control"
+                  id="fileInput"
+                  name="file"
+                  accept="image/*"
+                  onchange="showPreviewImage(this)"
+          />
+        </div>
+        <div class="mb-3">
+          <img
+                  id="preview"
+                  th:src="${category.image}"
+                  alt="미리보기 이미지"
+                  th:style="${
+                      category.image == null || category.image == ''
+                      ? 'display: none;'
+                      : 'display: block; max-width: 100%; height: auto;'
+                      }"
+          >
         </div>
         <button type="submit" class="btn btn-primary">게시판 수정</button>
         <button

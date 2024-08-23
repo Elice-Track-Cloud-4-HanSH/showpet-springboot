@@ -32,9 +32,8 @@ public class Comment {
   @LastModifiedDate
   private LocalDateTime updatedAt;
 
-  // 테스트 시에는 userId의 nullable을 true로 수정!
   @ManyToOne
-  @JoinColumn(name = "userId")
+  @JoinColumn(name = "userId", nullable = false)
   @ToString.Exclude
   private Member member;
 

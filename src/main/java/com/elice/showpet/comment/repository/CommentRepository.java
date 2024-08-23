@@ -13,8 +13,6 @@ public interface CommentRepository {
 
     Comment saveComment(Comment comment);
 
-    Comment saveComment(Long articleId, Comment comment);
-
     void deleteComment(Comment comment);
 
 }

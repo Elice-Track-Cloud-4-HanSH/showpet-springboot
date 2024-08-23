@@ -2,6 +2,8 @@ package com.elice.showpet.article.controller;
 
 import com.elice.showpet.article.entity.*;
 import com.elice.showpet.article.service.ArticleViewService;
+import com.elice.showpet.comment.entity.Comment;
+import com.elice.showpet.comment.service.CommentViewService;
 import com.elice.showpet.utils.Base64Codec;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,10 +22,12 @@ import java.util.List;
 @RequestMapping("/articles")
 public class ArticleViewController {
   private ArticleViewService articleViewService;
+  private CommentViewService commentViewService;
 
   @Autowired
-  public ArticleViewController(ArticleViewService articleViewService) {
+  public ArticleViewController(ArticleViewService articleViewService, CommentViewService commentViewService) {
     this.articleViewService = articleViewService;
+    this.commentViewService = commentViewService;
   }
 
   @GetMapping
@@ -39,7 +43,12 @@ public class ArticleViewController {
       Article article = articleViewService.getArticle(id);
       article.setImage(parseImage(article.getImage()));
       model.addAttribute("article", article);
-      model.addAttribute("comments", new ArrayList<String>());
+
+      // 댓글 리스트 조회
+      List<Comment> comments = commentViewService.getAllComments(id);
+      article.setComments(comments);
+      model.addAttribute("comments", comments);
+
       return "article/article";
     } catch (Exception e) {
       return "error";
@@ -74,6 +83,7 @@ public class ArticleViewController {
       articleDto.setImage(mimeType + "," + base64EncodedFile);
     }
     Article article = articleViewService.createArticle(articleDto);
+    System.out.println(article.toString());
     redirectAttributes.addAttribute("id", article.getId());
     return "redirect:/articles/{id}";
   }

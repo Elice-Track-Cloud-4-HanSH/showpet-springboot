@@ -78,8 +78,8 @@
             th:each="comment : ${comments}"
           >
             <div class="card-body position-relative">
-              <p class="mb-2" >댓글 내용</p>
-              <small class="text-secondary">2024-01-04T13:21:21</small>
+              <p class="mb-2" th:text="${comment.content}" >댓글 내용</p>
+              <small class="text-secondary" th:text="${#temporals.format(comment.updatedAt, 'yyyy.MM.dd HH:mm:ss')}">2024-01-04T13:21:21</small>
 
               <div
                 class="position-absolute end-0 top-50 translate-middle-y mb-3 me-3 btn-group bg-white bg-opacity-75"
@@ -90,7 +90,7 @@
                   class="btn btn-outline-primary lh-1"
                   data-bs-toggle="modal"
                   data-bs-target="#editCommentModal"
-
+                  th:onclick="handleEditCommentButton([[${comment.content}]], [[${comment.id}]], [[${article.id}]])"
                 >
                   <span class="material-symbols-outlined"> edit </span>
                 </button>
@@ -98,7 +98,7 @@
                   class="btn btn-outline-danger lh-1"
                   data-bs-toggle="modal"
                   data-bs-target="#deleteCommentModal"
-
+                  th:onclick="handleDeleteCommentButton(event, [[${comment.id}]])"
                 >
                   <span class="material-symbols-outlined"> delete </span>
                 </button>
@@ -232,7 +232,8 @@
               aria-label="Close"
             ></button>
           </div>
-          <form id="commentEditForm" method="POST">
+          <form id="commentEditForm"
+                method="POST">
             <div class="modal-body">
               <textarea
                 class="form-control"
@@ -308,8 +309,8 @@
     <script th:inline="javascript">
       let currentPArticle;
       let currentBoard;
-      let currentComment;
-      let elementToDelete;
+      let currentComment; // 삭제할 때 쓰는 commentId
+      let elementToDelete; // 삭제할 댓글 박스
 
       function handleDeleteArticleButton(_, postId) {
         currentArticle = postId;
@@ -331,11 +332,13 @@
         }).then(() => (window.location.href = `/boards/${currentBoard}`));
       }
 
+      // 댓글 삭제 버튼 클릭
       function handleDeleteCommentButton(e, commentId) {
         currentComment = commentId;
         elementToDelete = e.target.closest(".card");
       }
 
+      // 실제 댓글 삭제(알림창)
       function handleDeleteCommentModalButton() {
         fetch(`/comments/${currentComment}`, {
           method: "DELETE",
@@ -348,11 +351,11 @@
         modal.hide();
       }
 
-      function handleEditCommentButton(_, commentId, content) {
+      function handleEditCommentButton(content, commentId, articleId) {
         document.getElementById("commentContentTextarea").innerText = content;
         document
           .getElementById("commentEditForm")
-          .setAttribute("action", `/comments/${commentId}/edit`);
+          .setAttribute("action", `/comments/edit/${commentId}?articleId=${articleId}`);
       }
     </script>
   </body>

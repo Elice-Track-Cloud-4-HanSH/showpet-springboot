@@ -3,6 +3,8 @@ package com.elice.showpet.article.controller;
 import com.elice.showpet.article.entity.*;
 import com.elice.showpet.article.service.ArticleViewService;
 import com.elice.showpet.aws.s3.service.S3BucketService;
+import com.elice.showpet.comment.entity.Comment;
+import com.elice.showpet.comment.service.CommentViewService;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -22,10 +24,16 @@ import java.util.Objects;
 public class ArticleViewController {
   private ArticleViewService articleViewService;
   private S3BucketService s3BucketService;
+  private CommentViewService commentViewService;
 
   @Autowired
-  public ArticleViewController(ArticleViewService articleViewService, S3BucketService s3Service) {
+  public ArticleViewController(
+    ArticleViewService articleViewService,
+    CommentViewService commentViewService,
+    S3BucketService s3Service
+  ) {
     this.articleViewService = articleViewService;
+    this.commentViewService = commentViewService;
     this.s3BucketService = s3Service;
   }
 
@@ -41,7 +49,12 @@ public class ArticleViewController {
     try {
       Article article = articleViewService.getArticle(id);
       model.addAttribute("article", article);
-      model.addAttribute("comments", new ArrayList<String>());
+
+      // 댓글 리스트 조회
+      List<Comment> comments = commentViewService.getAllComments(id);
+      article.setComments(comments);
+      model.addAttribute("comments", comments);
+
       return "article/article";
     } catch (Exception e) {
       return "error";

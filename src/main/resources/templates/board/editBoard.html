@@ -26,25 +26,25 @@
       <div class="header mb-5">
         <h1 class="text-center">게시판 수정</h1>
       </div>
-      <article>
+      <form th:action="@{/category/edit/${category.id}}" method="post">
         <div class="mb-3">
           <label for="title">게시판 이름</label>
           <input
             type="text"
             class="form-control"
             id="title"
-            name="name"
+            name="title"
             maxlength="20"
             placeholder="게시판 이름 입력 (최대 20자)"
             required
-            th:value="${item.title}"
+            th:value="${category.title}"
           />
         </div>
         <div class="mb-3">
           <label for="content">게시판 설명</label>
-          <textarea class="form-control" id="content" name="description" maxlength="200" placeholder="게시판 설명 입력 (최대 200자)" th:text="${item.content}"></textarea>
+          <textarea class="form-control" id="content" name="content" maxlength="200" placeholder="게시판 설명 입력 (최대 200자)" th:text="${category.content}"></textarea>
         </div>
-        <button type="button" id="modify-btn" class="btn btn-primary">게시판 수정</button>
+        <button type="button"  class="btn btn-primary">게시판 수정</button>
         <button
           type="button"
           class="btn btn-secondary"
@@ -52,7 +52,7 @@
         >
           취소
         </button>
-      </article>
+      </form>
     </div>
 
     <!-- 부트스트랩 JS 추가 -->

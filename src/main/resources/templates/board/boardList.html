@@ -79,7 +79,7 @@
                   <input type="hidden" id="category-id" th:value="${category.id}">
                   <h4
                     class="card-title fw-bold text-dark"
-                    th:text="${cateogry.title}"
+                    th:text="${category.title}"
                   >
                     게시판 이름
                   </h4>
@@ -93,7 +93,7 @@
 
 
                 <div class="position-absolute end-0 bottom-0 mb-3 me-3 btn-group bg-white bg-opacity-75" role="group" aria-label="edit-delete">
-                  <button class="btn btn-outline-primary lh-1" type="button" id="modify-btn"
+                  <button class="btn btn-outline-primary lh-1"
                           th:onclick="|location.href='@{/category/edit/{categoryId}(categoryId=${category.id})}'|">
 <!--                    th:onclick="|location.href='@{/category/edit/id={categoryId}(categoryId=${item.id})}'|">-->
                     <span class="material-symbols-outlined"> edit </span>

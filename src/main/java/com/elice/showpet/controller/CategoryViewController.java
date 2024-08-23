@@ -5,6 +5,7 @@ import com.elice.showpet.domain.Category;
 import com.elice.showpet.dto.AddCategoryRequest;
 import com.elice.showpet.dto.CategoryListViewResponse;
 import com.elice.showpet.dto.CategoryViewResponse;
+import com.elice.showpet.dto.UpdateCategoryRequest;
 import com.elice.showpet.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -52,17 +53,21 @@ public class CategoryViewController {
     }
 
     @GetMapping("/edit/{id}")
-    public String editCategory(@RequestParam(required = false, name = "id") Long id, Model model) {
-        if (id != null) {
+    public String editCategory(@PathVariable("id") Long id, Model model) {
             Category category = categoryService.findById(id);
             model.addAttribute("category", new CategoryViewResponse(category));
-        }
             return "board/editBoard";
     }
 
     @PostMapping("/new")
     public String addCategory(@ModelAttribute AddCategoryRequest request) {
         Category savedCategory = categoryService.save(request);
+        return "redirect:/category";
+    }
+
+    @PostMapping("/new")
+    public String editCategory(@PathVariable("id") Long id, UpdateCategoryRequest request) {
+        Category savedCategory = categoryService.update(id, request);
         return "redirect:/category";
     }
 }

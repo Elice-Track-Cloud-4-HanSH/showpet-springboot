@@ -2,9 +2,9 @@ package com.elice.showpet.article.controller;
 
 import com.elice.showpet.article.entity.*;
 import com.elice.showpet.article.service.ArticleViewService;
+import com.elice.showpet.aws.s3.service.S3BucketService;
 import com.elice.showpet.comment.entity.Comment;
 import com.elice.showpet.comment.service.CommentViewService;
-import com.elice.showpet.utils.Base64Codec;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -16,18 +16,25 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Controller
 @NoArgsConstructor
 @RequestMapping("/articles")
 public class ArticleViewController {
   private ArticleViewService articleViewService;
+  private S3BucketService s3BucketService;
   private CommentViewService commentViewService;
 
   @Autowired
-  public ArticleViewController(ArticleViewService articleViewService, CommentViewService commentViewService) {
+  public ArticleViewController(
+    ArticleViewService articleViewService,
+    CommentViewService commentViewService,
+    S3BucketService s3Service
+  ) {
     this.articleViewService = articleViewService;
     this.commentViewService = commentViewService;
+    this.s3BucketService = s3Service;
   }
 
   @GetMapping
@@ -41,7 +48,6 @@ public class ArticleViewController {
   public String getArticle(@PathVariable Long id, Model model) {
     try {
       Article article = articleViewService.getArticle(id);
-      article.setImage(parseImage(article.getImage()));
       model.addAttribute("article", article);
 
       // 댓글 리스트 조회
@@ -55,17 +61,6 @@ public class ArticleViewController {
     }
   }
 
-  private String parseImage(String image) {
-    try {
-      if (image == null || image.isEmpty()) throw new Exception();
-      String[] imageInfo = image.split(","); // image[0] : mimeType, image[1] : base64 data
-      image = "data:" + imageInfo[0] + ";base64," + imageInfo[1];
-    } catch (Exception e) {
-      image = null;
-    }
-    return image;
-  }
-
   @GetMapping("/add")
   public String addArticleForm(Model model) {
     return "article/createArticle";
@@ -76,23 +71,28 @@ public class ArticleViewController {
     @ModelAttribute CreateArticleDto articleDto,
     @RequestParam("file") MultipartFile file,
     RedirectAttributes redirectAttributes
-  ) throws IOException {
-    if (!file.getContentType().startsWith("application")) {
-      String base64EncodedFile = Base64Codec.encode(file);
-      String mimeType = file.getContentType();
-      articleDto.setImage(mimeType + "," + base64EncodedFile);
+  ) {
+    try {
+      if (Objects.requireNonNull(file.getContentType()).startsWith("image")) {
+        String imageUrl = s3BucketService.uploadFile(file);
+        articleDto.setImage(imageUrl);
+      }
+      Article article = articleViewService.createArticle(articleDto);
+      redirectAttributes.addAttribute("id", article.getId());
+      return "redirect:/articles/{id}";
+    } catch (IOException e) {
+      return "redirect:/articles/add";
     }
-    Article article = articleViewService.createArticle(articleDto);
-    System.out.println(article.toString());
-    redirectAttributes.addAttribute("id", article.getId());
-    return "redirect:/articles/{id}";
   }
 
   @GetMapping("/edit/{id}")
-  public String editArticleForm(@PathVariable Long id, Model model) {
+  public String editArticleForm(
+    @PathVariable Long id,
+    Model model
+  ) {
     try {
       Article article = articleViewService.getArticle(id);
-      article.setImage(parseImage(article.getImage()));
+      article.setImage(article.getImage());
       model.addAttribute("article", article);
       return "article/editArticle";
     } catch (Exception e) {
@@ -108,10 +108,9 @@ public class ArticleViewController {
     RedirectAttributes redirectAttributes
   ) {
     try {
-      if (!file.getContentType().startsWith("application")) {
-        String base64EncodedFile = Base64Codec.encode(file);
-        String mimeType = file.getContentType();
-        articleDto.setImage(mimeType + "," + base64EncodedFile);
+      if (Objects.requireNonNull(file.getContentType()).startsWith("image")) {
+        String imageUrl = s3BucketService.uploadFile(file);
+        articleDto.setImage(imageUrl);
       }
       Article article = articleViewService.updateArticle(id, articleDto);
 
@@ -119,7 +118,7 @@ public class ArticleViewController {
       redirectAttributes.addFlashAttribute("message", "게시글이 수정되었습니다.");
       return "redirect:/articles/{id}";
     } catch (Exception e) {
-      return "error";
+      return "redirect:/articles/edit/{id}";
     }
   }
 
@@ -130,7 +129,7 @@ public class ArticleViewController {
   ) {
     try {
       articleViewService.deleteArticle(id);
-      return "redirect:/articles";
+      return "redirect:/boards";
     } catch (Exception e) {
       return "error";
     }

@@ -53,7 +53,7 @@ public class CategoryViewController {
     }
 
     @GetMapping("/edit/{id}")
-    public String editCategory(@PathVariable("id") Long id, Model model) {
+    public String editCategory(@PathVariable("id") long id, Model model) {
             Category category = categoryService.findById(id);
             model.addAttribute("category", new CategoryViewResponse(category));
             return "board/editBoard";
@@ -65,9 +65,15 @@ public class CategoryViewController {
         return "redirect:/category";
     }
 
-    @PostMapping("/new")
-    public String editCategory(@PathVariable("id") Long id, UpdateCategoryRequest request) {
+    @PostMapping("/edit/{id}")
+    public String editCategory(@PathVariable("id") long id, UpdateCategoryRequest request) {
         Category savedCategory = categoryService.update(id, request);
+        return "redirect:/category";
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public String deleteCategory(@PathVariable("id") Long id) {
+        categoryService.delete(id);
         return "redirect:/category";
     }
 }

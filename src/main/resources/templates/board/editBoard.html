@@ -26,7 +26,7 @@
       <div class="header mb-5">
         <h1 class="text-center">게시판 수정</h1>
       </div>
-      <form th:action="@{/category/edit/${category.id}}" method="post">
+      <form th:action="@{/category/edit/{categoryId}(categoryId=${category.id})}" method="post">
         <div class="mb-3">
           <label for="title">게시판 이름</label>
           <input
@@ -44,7 +44,7 @@
           <label for="content">게시판 설명</label>
           <textarea class="form-control" id="content" name="content" maxlength="200" placeholder="게시판 설명 입력 (최대 200자)" th:text="${category.content}"></textarea>
         </div>
-        <button type="button"  class="btn btn-primary">게시판 수정</button>
+        <button type="submit" class="btn btn-primary">게시판 수정</button>
         <button
           type="button"
           class="btn btn-secondary"

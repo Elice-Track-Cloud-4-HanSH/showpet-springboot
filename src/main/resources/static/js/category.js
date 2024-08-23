@@ -14,18 +14,18 @@ if (deleteButton) {
     });
 }
 
-//let currentBoard;
-//
-//      function handleDeleteButton(e, itemId) {
-//        e.preventDefault();
-//        currentBoard = itemId;
-//      }
-//
-//      function handleDeleteModalButton() {
-//        fetch(`/api/category/${id}`, {
-//          method: "DELETE",
-//        }).then(() => (window.location.href = "/category"));
-//      }
+let currentBoard;
+
+      function handleDeleteButton(e, itemId) {
+        e.preventDefault();
+        currentBoard = itemId;
+      }
+
+      function handleDeleteModalButton() {
+        fetch(`/api/category/${id}`, {
+          method: "DELETE",
+        }).then(() => (window.location.href = "/category"));
+      }
 
 // 수정 기능
 const modifyButton = document.getElementById('modify-btn');

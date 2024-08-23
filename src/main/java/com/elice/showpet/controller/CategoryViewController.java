@@ -46,11 +46,9 @@ public class CategoryViewController {
     }
 
     @GetMapping("/category/edit/{id}")
-    public String editCategory(@RequestParam(required = false, name = "id") Long id, Model model) {
-        if (id != null) {
-            Category category = categoryService.findById(id);
-            model.addAttribute("category", new CategoryViewResponse(category));
-        }
+    public String editCategory(@PathVariable("id") Long id, Model model) {
+        Category category = categoryService.findById(id);
+        model.addAttribute("category", new CategoryViewResponse(category));
         return "board/editBoard";
     }
 }

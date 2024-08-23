@@ -27,7 +27,7 @@
         <h1 class="text-center">게시판 수정</h1>
       </div>
       <article>
-        <input type="hidden" id="category-id" th:value="${category.id}">
+        <input type="hidden" id="category-id" th:value="${category?.id}">
         <div class="mb-3">
           <label for="title">게시판 이름</label>
           <input
@@ -38,7 +38,7 @@
             maxlength="20"
             placeholder="게시판 이름 입력 (최대 20자)"
             required
-            th:value="${category.title}"
+            th:value="${category?.title}"
           />
         </div>
         <div class="mb-3">

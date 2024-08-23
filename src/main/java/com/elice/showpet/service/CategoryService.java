@@ -3,6 +3,7 @@ package com.elice.showpet.service;
 import com.elice.showpet.domain.Category;
 import com.elice.showpet.dto.AddCategoryRequest;
 import com.elice.showpet.dto.UpdateCategoryRequest;
+import com.elice.showpet.exception.ResourceNotFoundException;
 import com.elice.showpet.repository.CategoryRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,7 @@ public class CategoryService {
 
     public Category findById(long id) {
         return categoryRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("not found : " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
     }
 
     public void delete(long id) {
@@ -43,4 +44,7 @@ public class CategoryService {
 
         return category;
     }
+
+
+
 }

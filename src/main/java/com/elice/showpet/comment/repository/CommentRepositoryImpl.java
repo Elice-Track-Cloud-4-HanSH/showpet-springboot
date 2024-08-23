@@ -71,6 +71,33 @@ public class CommentRepositoryImpl implements CommentRepository {
     }
 
     @Override
+    public Comment saveComment(Long articleId, Comment comment) {
+        if (comment.getId() == null) {
+            String insertSql = "INSERT INTO comment (content, created_at, updated_at, article_id) VALUES (?, ?, ?, ?)";
+            KeyHolder keyHolder = new GeneratedKeyHolder();
+
+            jdbcTemplate.update(
+                    connection -> {
+                        PreparedStatement ps = connection.prepareStatement(insertSql, new String[]{"id"});
+                        ps.setString(1, comment.getContent());
+                        ps.setObject(2, LocalDateTime.now());
+                        ps.setObject(3, LocalDateTime.now());
+                        ps.setLong(4, articleId);
+                        return ps;
+                    }, keyHolder);
+
+            Number key = keyHolder.getKey();
+            if (key != null) {
+                comment.setId(key.longValue());
+            }
+        } else {
+            String updateSql = "UPDATE comment SET content = ?, updated_at = ? WHERE id = ?";
+            jdbcTemplate.update(updateSql, comment.getContent(), LocalDateTime.now(), comment.getId());
+        }
+        return comment;
+    }
+
+    @Override
     public void deleteComment(Comment comment) {
         String sql = "DELETE FROM comment WHERE id = ?";
         jdbcTemplate.update(sql, comment.getId());

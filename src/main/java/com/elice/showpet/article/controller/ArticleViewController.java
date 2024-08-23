@@ -2,6 +2,8 @@ package com.elice.showpet.article.controller;
 
 import com.elice.showpet.article.entity.*;
 import com.elice.showpet.article.service.ArticleViewService;
+import com.elice.showpet.comment.entity.Comment;
+import com.elice.showpet.comment.service.CommentViewService;
 import com.elice.showpet.aws.s3.service.S3BucketService;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -22,11 +23,17 @@ import java.util.Objects;
 public class ArticleViewController {
   private ArticleViewService articleViewService;
   private S3BucketService s3BucketService;
+  private CommentViewService commentViewService;
 
   @Autowired
-  public ArticleViewController(ArticleViewService articleViewService, S3BucketService s3Service) {
+  public ArticleViewController(
+    ArticleViewService articleViewService,
+    S3BucketService s3Service,
+    CommentViewService commentViewService
+  ) {
     this.articleViewService = articleViewService;
     this.s3BucketService = s3Service;
+    this.commentViewService = commentViewService;
   }
 
   @GetMapping
@@ -41,7 +48,12 @@ public class ArticleViewController {
     try {
       Article article = articleViewService.getArticle(id);
       model.addAttribute("article", article);
-      model.addAttribute("comments", new ArrayList<String>());
+
+      // 댓글 리스트 조회
+      List<Comment> comments = commentViewService.getAllComments(id);
+      article.setComments(comments);
+      model.addAttribute("comments", comments);
+
       return "article/article";
     } catch (Exception e) {
       return "error";

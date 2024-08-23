@@ -18,8 +18,8 @@ import java.util.List;
 public class CategoryApiController {
     private final CategoryService categoryService;
 
-    @PostMapping("/api/category/create")
-    public ResponseEntity<Category> addArticle(@RequestBody AddCategoryRequest request) {
+    @PostMapping("/api/category")
+    public ResponseEntity<Category> addCategory(@RequestBody AddCategoryRequest request) {
         Category savedCategory = categoryService.save(request);
 
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -38,15 +38,15 @@ public class CategoryApiController {
     }
 
     @GetMapping("/api/category/{id}")
-    public ResponseEntity<CategoryResponse> findCategory(@PathVariable("id") long id) {
+    public ResponseEntity<CategoryResponse> findCategory(@PathVariable("id") Long id) {
         Category category = categoryService.findById(id);
 
         return ResponseEntity.ok()
                 .body(new CategoryResponse(category));
     }
 
-    @DeleteMapping("/api/category/{id}/delete")
-    public ResponseEntity<Void> deleteCategory(@PathVariable("id") long id) {
+    @DeleteMapping("/api/category/{id}")
+    public ResponseEntity<Void> deleteCategory(@PathVariable("id") Long id) {
         categoryService.delete(id);
 
         return ResponseEntity.ok()
@@ -54,7 +54,7 @@ public class CategoryApiController {
     }
 
     @PutMapping("/api/category/{id}")
-    public ResponseEntity<Category> updateCategory(@PathVariable("id") long id, @RequestBody UpdateCategoryRequest request) {
+    public ResponseEntity<Category> updateCategory(@PathVariable("id") Long id, @RequestBody UpdateCategoryRequest request) {
         Category updateCategory = categoryService.update(id, request);
 
         return ResponseEntity.ok()

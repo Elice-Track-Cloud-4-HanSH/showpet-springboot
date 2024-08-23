@@ -1,10 +1,10 @@
-// 삭제 기능
+ 삭제 기능
 const deleteButton = document.getElementById('delete-btn');
 
 if (deleteButton) {
     deleteButton.addEventListener('click', event => {
-        let id = document.getElementById('category-id').value;
-        fetch('/api/category/${id}/delete', {
+        let id = document.getElementById('categoryId').value;
+        fetch(`/api/category/${id}`, {
             method: 'DELETE'
         })
             .then(() => {
@@ -14,15 +14,18 @@ if (deleteButton) {
     });
 }
 
-function handleDeleteButton(event, id)  {
-    fetch('/api/category/${id}/delete', {
-                method: 'DELETE'
-            })
-                .then(() => {
-                    alert('삭제가 완료되었습니다.');
-                    location.replace('/category');
-                });
-    }
+//let currentBoard;
+//
+//      function handleDeleteButton(e, itemId) {
+//        e.preventDefault();
+//        currentBoard = itemId;
+//      }
+//
+//      function handleDeleteModalButton() {
+//        fetch(`/api/category/${id}`, {
+//          method: "DELETE",
+//        }).then(() => (window.location.href = "/category"));
+//      }
 
 // 수정 기능
 const modifyButton = document.getElementById('modify-btn');
@@ -32,7 +35,7 @@ if (modifyButton) {
         let params = new URLSearchParams(location.search);
         let id = params.get('id');
 
-        fetch('/api/category/${id}', {
+        fetch(`/api/category/${id}`, {
             method: 'PUT',
             headers: {
                 "Content-Type": "application/json",
@@ -53,7 +56,7 @@ const createButton = document.getElementById('create-btn');
 
 if (createButton) {
     createButton.addEventListener('click', event => {
-        fetch('/api/category/create', {
+        fetch(`/api/category`, {
             method: 'POST',
             headers: {
                 "Content-Type": "application/json",

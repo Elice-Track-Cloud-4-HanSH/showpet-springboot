@@ -2,24 +2,24 @@ package com.elice.showpet.controller;
 
 
 import com.elice.showpet.domain.Category;
+import com.elice.showpet.dto.AddCategoryRequest;
 import com.elice.showpet.dto.CategoryListViewResponse;
 import com.elice.showpet.dto.CategoryViewResponse;
 import com.elice.showpet.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 @RequiredArgsConstructor
 @Controller
+@RequestMapping("/category")
 public class CategoryViewController {
 
     private final CategoryService categoryService;
 
-    @GetMapping("/category")
+    @GetMapping()
     public String getArticles(Model model) {
         List<CategoryListViewResponse> category = categoryService.findAll()
                 .stream()
@@ -37,20 +37,32 @@ public class CategoryViewController {
 //        return "board/board";
 //    }
 
-    @GetMapping("/category/new")
+    @GetMapping("/new")
     public String newCategory(@RequestParam(required = false, name = "id") Long id, Model model) {
-        if(id == null) { // id가 없으면 새롭게 블로그를 만든다.
+        if (id == null) { // id가 없으면 새롭게 블로그를 만든다.
             model.addAttribute("category", new CategoryViewResponse());
+
+//        } else {
+//            Category category = categoryService.findById(id);
+//            model.addAttribute("category", new CategoryViewResponse(category));
+//            return "board/editBoard";
+//        }
         }
         return "board/createBoard";
     }
 
-    @GetMapping("/category/edit/{id}")
+    @GetMapping("/edit/{id}")
     public String editCategory(@RequestParam(required = false, name = "id") Long id, Model model) {
         if (id != null) {
             Category category = categoryService.findById(id);
             model.addAttribute("category", new CategoryViewResponse(category));
         }
-        return "board/editBoard";
+            return "board/editBoard";
+    }
+
+    @PostMapping("/new")
+    public String addCategory(@ModelAttribute AddCategoryRequest request) {
+        Category savedCategory = categoryService.save(request);
+        return "redirect:/category";
     }
 }

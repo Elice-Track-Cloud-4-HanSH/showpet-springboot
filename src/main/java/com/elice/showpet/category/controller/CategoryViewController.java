@@ -1,12 +1,12 @@
-package com.elice.showpet.controller;
+package com.elice.showpet.category.controller;
 
 
-import com.elice.showpet.domain.Category;
-import com.elice.showpet.dto.AddCategoryRequest;
-import com.elice.showpet.dto.CategoryListViewResponse;
-import com.elice.showpet.dto.CategoryViewResponse;
-import com.elice.showpet.dto.UpdateCategoryRequest;
-import com.elice.showpet.service.CategoryService;
+import com.elice.showpet.category.domain.Category;
+import com.elice.showpet.category.dto.AddCategoryRequest;
+import com.elice.showpet.category.dto.CategoryListViewResponse;
+import com.elice.showpet.category.dto.CategoryViewResponse;
+import com.elice.showpet.category.dto.UpdateCategoryRequest;
+import com.elice.showpet.category.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,14 +21,14 @@ public class CategoryViewController {
     private final CategoryService categoryService;
 
     @GetMapping()
-    public String getArticles(Model model) {
+    public String getCategory(Model model) {
         List<CategoryListViewResponse> category = categoryService.findAll()
                 .stream()
                 .map(CategoryListViewResponse::new)
                 .toList();
         model.addAttribute("category", category);
 
-        return "board/boardList";
+        return "category/boardList";
     }
 
 //    @GetMapping("/category/{id}")
@@ -49,14 +49,14 @@ public class CategoryViewController {
 //            return "board/editBoard";
 //        }
         }
-        return "board/createBoard";
+        return "category/createBoard";
     }
 
     @GetMapping("/edit/{id}")
     public String editCategory(@PathVariable("id") long id, Model model) {
             Category category = categoryService.findById(id);
             model.addAttribute("category", new CategoryViewResponse(category));
-            return "board/editBoard";
+            return "category/editBoard";
     }
 
     @PostMapping("/new")

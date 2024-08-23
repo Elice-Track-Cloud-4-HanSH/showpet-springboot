@@ -1,11 +1,11 @@
-package com.elice.showpet.controller;
+package com.elice.showpet.category.controller;
 
 
-import com.elice.showpet.domain.Category;
-import com.elice.showpet.dto.AddCategoryRequest;
-import com.elice.showpet.dto.CategoryResponse;
-import com.elice.showpet.dto.UpdateCategoryRequest;
-import com.elice.showpet.service.CategoryService;
+import com.elice.showpet.category.domain.Category;
+import com.elice.showpet.category.dto.AddCategoryRequest;
+import com.elice.showpet.category.dto.CategoryResponse;
+import com.elice.showpet.category.dto.UpdateCategoryRequest;
+import com.elice.showpet.category.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

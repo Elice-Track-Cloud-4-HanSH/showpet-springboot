@@ -1,9 +1,9 @@
-package com.elice.showpet.service;
+package com.elice.showpet.category.service;
 
-import com.elice.showpet.domain.Category;
-import com.elice.showpet.dto.AddCategoryRequest;
-import com.elice.showpet.dto.UpdateCategoryRequest;
-import com.elice.showpet.repository.CategoryRepository;
+import com.elice.showpet.category.domain.Category;
+import com.elice.showpet.category.dto.AddCategoryRequest;
+import com.elice.showpet.category.dto.UpdateCategoryRequest;
+import com.elice.showpet.category.repository.CategoryRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

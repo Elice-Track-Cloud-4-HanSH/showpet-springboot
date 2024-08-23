@@ -1,4 +1,4 @@
-package com.elice.showpet.domain;
+package com.elice.showpet.category.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;

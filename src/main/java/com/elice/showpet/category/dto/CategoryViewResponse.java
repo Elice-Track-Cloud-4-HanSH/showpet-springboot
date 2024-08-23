@@ -1,7 +1,7 @@
-package com.elice.showpet.dto;
+package com.elice.showpet.category.dto;
 
 
-import com.elice.showpet.domain.Category;
+import com.elice.showpet.category.domain.Category;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 

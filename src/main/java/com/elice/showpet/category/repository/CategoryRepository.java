@@ -1,6 +1,6 @@
-package com.elice.showpet.repository;
+package com.elice.showpet.category.repository;
 
-import com.elice.showpet.domain.Category;
+import com.elice.showpet.category.domain.Category;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 

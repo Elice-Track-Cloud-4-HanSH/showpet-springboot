@@ -1,4 +1,4 @@
-package com.elice.showpet.dto;
+package com.elice.showpet.category.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

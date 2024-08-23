@@ -36,13 +36,6 @@ public class ArticleViewController {
     this.commentViewService = commentViewService;
   }
 
-  @GetMapping
-  public String getArticles(Model model) {
-    List<Article> articles = articleViewService.getAllArticles();
-
-    return "article/article";
-  }
-
   @GetMapping("/{id}")
   public String getArticle(@PathVariable Long id, Model model) {
     try {

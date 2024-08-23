@@ -1,0 +1,23 @@
+[33mcommit 5c576e7f1acffe575a12467265b61f3dcffa43b4[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfeat/hyeonseung/#1/category[m[33m)[m
+Author: [CLOUD4] 차현승 <gustmd9694@gmail.com>
+Date:   Thu Aug 22 16:06:03 2024 +0900
+
+    게시판 CRUD 제작, HTML 연동 단계
+
+[33mcommit 42ce02ddca2524ff24f3a5bf6c0d14a54cf60c13[m[33m ([m[1;32mdev[m[33m)[m
+Author: PromotezCitizen <gkstkdgus821@gmail.com>
+Date:   Tue Aug 20 17:30:25 2024 +0900
+
+    Feat: MapStruct 의존성 추가
+
+[33mcommit 8be4adc41c7c1970139b477a34a74e2ac9eba379[m
+Author: PromotezCitizen <gkstkdgus821@gmail.com>
+Date:   Tue Aug 20 16:35:08 2024 +0900
+
+    Feat: Hello World를 출력하는 테스트 엔드포인트 추가
+
+[33mcommit 7e634a2d68481626b4b624f4745b7c2a0d0a410e[m[33m ([m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmaster[m[33m)[m
+Author: PromotezCitizen <gkstkdgus821@gmail.com>
+Date:   Tue Aug 20 16:23:13 2024 +0900
+
+    first commit

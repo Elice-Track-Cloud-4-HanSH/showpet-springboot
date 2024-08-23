@@ -23,10 +23,10 @@ public class Category {
   private Long id;
 
   @Column(nullable = false, length = 100)
-  private String name;
+  private String title;
 
   @Column(nullable = false, length = 300)
-  private String description;
+  private String content;
 
   private String image;
 
@@ -42,4 +42,15 @@ public class Category {
   @JoinColumn(name = "userId")
   @ToString.Exclude
   private Member member;
+
+  @Builder
+  public Category(String title, String content) {
+    this.title = title;
+    this.content = content;
+  }
+
+  public void update(String title, String content) {
+    this.title = title;
+    this.content = content;
+  }
 }

@@ -19,9 +19,11 @@ public class S3BucketService {
   @Value("${aws.s3.bucket.name}")
   private String bucketName;
 
+  private final String bucketUrl = "https://showpet.s3.ap-northeast-2.amazonaws.com/";
+
   public String uploadFile(MultipartFile file) throws IOException {
     String fileName = makeHashedFileName(file);
-    String fileUrl = "https://showpet.s3.ap-northeast-2.amazonaws.com/" + fileName;
+    String fileUrl = bucketUrl + fileName;
     ObjectMetadata metadata =  createFileMetadata(file);
     try {
       s3Client.putObject(bucketName, fileName, file.getInputStream(), metadata);
@@ -32,6 +34,9 @@ public class S3BucketService {
   }
 
   public void deleteFile(String fileName) {
+    if (fileName.startsWith("https")) {
+      fileName = fileName.substring(bucketUrl.length());
+    }
     s3Client.deleteObject(bucketName, fileName);
   }
 

@@ -18,6 +18,24 @@
       body {
         font-family: "Elice DX Neolli", sans-serif;
       }
+      .icon-container {
+        position: relative; /* 부모 컨테이너를 상대적으로 배치합니다. */
+        display: inline-block; /* 필요에 따라 크기 조정 */
+      }
+      .icon-container img {
+        display: block; /* 이미지의 기본 블록 레벨 디스플레이 */
+      }
+      .icon-container .overlay {
+        position: absolute; /* 자식 요소를 절대적으로 배치합니다. */
+        top: 20px;
+        right: 20px;
+        width: 32px; /* 부모 요소에 맞추어 크기 조정 */
+        height: 32px; /* 부모 요소에 맞추어 크기 조정 */
+        z-index: 10; /* 오버레이를 다른 이미지 위로 이동 */
+        background-color: white;
+        cursor: pointer;
+        pointer-events: auto;
+      }
     </style>
     <title>게시글 수정</title>
     <script>
@@ -36,6 +54,13 @@
           preview.src = "#";
           preview.style.display = "none";
         }
+      }
+
+      function removeImage(input) {
+        const deleteFlagText = document.getElementById("deleted");
+        const preview = document.getElementById('preview');
+        deleteFlagText.value = "t";
+        preview.src = "#";
       }
     </script>
   </head>
@@ -84,7 +109,14 @@
                   onchange="showPreviewImage(this)"
           />
         </div>
-        <div class="mb-3">
+        <div class="mb-3 icon-container">
+          <img
+                  th:src="@{/image/x.svg}"
+                  class="overlay"
+                  title="이미지 삭제 버튼입니다!"
+                  id="delete-btn"
+                  onclick="removeImage(this)"
+          />
           <img
                   id="preview"
                   th:src="${article.image}"
@@ -96,6 +128,12 @@
                       }"
           >
         </div>
+
+        <input
+                type="hidden"
+                id="deleted"
+                name="imageDeleted"
+        />
 
         <button type="submit" class="btn btn-primary">수정</button>
         <button

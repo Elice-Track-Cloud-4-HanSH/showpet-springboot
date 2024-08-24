@@ -9,4 +9,5 @@ public class UpdateArticleDto {
   private String title;
   private String content;
   private String image;
+  private String imageDeleted;
 }

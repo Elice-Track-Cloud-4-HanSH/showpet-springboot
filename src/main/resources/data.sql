@@ -1,0 +1,1 @@
+INSERT INTO category(title, content) VALUES ('1234', 'qwer'), ('qwer', 'asdf');

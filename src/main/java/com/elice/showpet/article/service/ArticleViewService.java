@@ -46,6 +46,10 @@ public class ArticleViewService {
     return articleRepository.findById(id).orElseThrow(() -> new Exception("Article not found"));
   }
 
+  public List<Article> getPagenatedArticles(int categoryId, int page, int pageSize) {
+    return articleRepository.findPagenated(categoryId, page, pageSize);
+  }
+
   public Article createArticle(CreateArticleDto articleDto) {
     Article created = articleMapper.toEntity(articleDto);
     Category category = categoryService.findById(articleDto.getCategoryId());

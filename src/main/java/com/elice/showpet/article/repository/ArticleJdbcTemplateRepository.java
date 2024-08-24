@@ -54,6 +54,12 @@ public class ArticleJdbcTemplateRepository implements JdbcTemplateRepository {
   }
 
   @Override
+  public List<Article> findPagenated(int categoryId, int page, int pageSize) {
+    String sql = "SELECT * FROM article WHERE category_id = ? LIMIT ? OFFSET ?";
+    return jdbcTemplate.query(sql, articleRowMapper, categoryId, pageSize, pageSize * page);
+  }
+
+  @Override
   public Optional<Article> findById(Long id) {
     String sql = "SELECT * FROM article WHERE id = ?";
     return jdbcTemplate.query(sql, new Object[]{id}, articleRowMapper).stream().findFirst();

@@ -45,15 +45,16 @@ public class ArticleViewService {
   }
 
   public Article updateArticle(Long id, UpdateArticleDto articleDto) throws Exception {
-    Article findArticle = articleRepository.findById(id).orElseThrow(() -> new Exception("Article not found"));
+    Article findArticle = getArticle(id);
 
+    Optional.ofNullable(articleDto.getImageDeleted()).flatMap(_ -> Optional.ofNullable(findArticle.getImage())).ifPresent(this::removeImage);
     Optional.ofNullable(articleDto.getTitle())
       .ifPresent(findArticle::setTitle);
     Optional.ofNullable(articleDto.getContent())
       .ifPresent(findArticle::setContent);
     Optional.ofNullable(articleDto.getImage())
       .ifPresent((image) -> {
-        s3BucketService.deleteFile(findArticle.getImage().replace("https://showpet.s3.ap-northeast-2.amazonaws.com/", ""));
+        Optional.ofNullable(findArticle.getImage()).ifPresent(this::removeImage);
         findArticle.setImage(image);
       });
 
@@ -61,7 +62,12 @@ public class ArticleViewService {
   }
 
   public void deleteArticle(Long id) throws Exception {
-    Article article = articleRepository.findById(id).orElseThrow(() -> new Exception("Article not found"));
+    Article article = getArticle(id);
     articleRepository.delete(article);
+    removeImage(article.getImage());
+  }
+
+  public void removeImage(String image) {
+    s3BucketService.deleteFile(image);
   }
 }

@@ -48,11 +48,11 @@
       <div class="container border rounded p-4 position-relative">
         <div class="header mb-3">
           <h2 class="text-start" th:text="${article.title}">게시글 제목</h2>
+          <p class="text-start" th:text="${#temporals.format(article.updatedAt, 'yyyy.MM.dd HH:mm:ss')} + ${article.createdAt == article.updatedAt ? '' : '(수정됨)'}"></p>
         </div>
         <p class="m-0" th:text="${article.content}">게시글 내용</p>
         <div th:if="${article.image != null && article.image != ''}" class="mt-4">
-          <img
-                  src="#"
+          <img src="#"
           alt="게시글 이미지"
           class="img-fluid rounded"
           th:src="@{${article.image}}"
@@ -307,7 +307,7 @@
       crossorigin="anonymous"
     ></script>
     <script th:inline="javascript">
-      let currentPArticle;
+      let currentArticle;
       let currentBoard;
       let currentComment; // 삭제할 때 쓰는 commentId
       let elementToDelete; // 삭제할 댓글 박스
@@ -319,10 +319,6 @@
       function handleDeleteArticleButton(_, postId, boardId) {
         currentArticle = postId;
         currentBoard = boardId;
-      }
-
-      function handleCreateArticleButton() {
-
       }
 
       function handleDeleteArticleModalButton() {

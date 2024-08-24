@@ -45,7 +45,10 @@ public class ArticleViewController {
   }
 
   @GetMapping("/{id}")
-  public String getArticle(@PathVariable Long id, Model model) {
+  public String getArticle(
+    @PathVariable("id") Long id,
+    Model model
+  ) {
     try {
       Article article = articleViewService.getArticle(id);
       model.addAttribute("article", article);
@@ -87,7 +90,7 @@ public class ArticleViewController {
 
   @GetMapping("/edit/{id}")
   public String editArticleForm(
-    @PathVariable Long id,
+    @PathVariable("id") Long id,
     Model model
   ) {
     try {
@@ -104,7 +107,7 @@ public class ArticleViewController {
   public String editArticle(
     @ModelAttribute UpdateArticleDto articleDto,
     @RequestParam("file") MultipartFile file,
-    @PathVariable Long id,
+    @PathVariable("id") Long id,
     RedirectAttributes redirectAttributes
   ) {
     try {
@@ -124,7 +127,7 @@ public class ArticleViewController {
 
   @DeleteMapping("/{id}")
   public String deleteArticle(
-    @PathVariable Long id,
+    @PathVariable("id") Long id,
     RedirectAttributes redirectAttributes
   ) {
     try {

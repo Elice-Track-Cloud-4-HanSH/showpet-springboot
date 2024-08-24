@@ -1,6 +1,10 @@
 package com.elice.showpet.article.repository;
 
 import com.elice.showpet.article.entity.Article;
+import com.elice.showpet.category.entity.Category;
+import com.elice.showpet.category.repository.CategoryRepository;
+import com.elice.showpet.member.entity.Member;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -16,12 +20,21 @@ import java.util.Optional;
 @Repository
 public class ArticleJdbcTemplateRepository implements JdbcTemplateRepository {
   private final JdbcTemplate jdbcTemplate;
+  private CategoryRepository categoryRepository;
 
-  public ArticleJdbcTemplateRepository(JdbcTemplate jdbcTemplate) {
+  @Autowired
+  public ArticleJdbcTemplateRepository(
+    JdbcTemplate jdbcTemplate,
+    CategoryRepository categoryRepository
+  ) {
     this.jdbcTemplate = jdbcTemplate;
+    this.categoryRepository = categoryRepository;
   }
 
   private final RowMapper<Article> articleRowMapper = (rs, rowNum) -> {
+    Long categoryId = rs.getLong("category_id");
+    Category category = categoryRepository.findById(categoryId)
+                          .orElseThrow(() -> new IllegalArgumentException("category not found : " + categoryId));
     return Article.builder()
             .id(rs.getLong("id"))
             .title(rs.getString("title"))
@@ -29,6 +42,8 @@ public class ArticleJdbcTemplateRepository implements JdbcTemplateRepository {
             .image(rs.getString("image"))
             .createdAt(rs.getObject("created_at", LocalDateTime.class))
             .updatedAt(rs.getObject("updated_at", LocalDateTime.class))
+//            .member(rs.getObject("member", Member.class))
+            .category(category)
             .build();
   };
 
@@ -47,7 +62,7 @@ public class ArticleJdbcTemplateRepository implements JdbcTemplateRepository {
   @Override
   public Article save(Article article) {
     if (article.getId() == null) {
-      String insertSql = "INSERT INTO article(title, content, image, created_at, updated_at) VALUES (?, ?, ?, ?, ?)";
+      String insertSql = "INSERT INTO article(title, content, image, created_at, updated_at, category_id) VALUES (?, ?, ?, ?, ?, ?)";
       KeyHolder keyHolder = new GeneratedKeyHolder();
 
       jdbcTemplate.update(
@@ -59,6 +74,7 @@ public class ArticleJdbcTemplateRepository implements JdbcTemplateRepository {
           ps.setString(3, article.getImage());
           ps.setObject(4, now);
           ps.setObject(5, now);
+          ps.setLong(6, article.getCategory().getId());
           return ps;
         }, keyHolder
       );

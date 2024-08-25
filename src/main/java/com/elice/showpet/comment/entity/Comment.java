@@ -1,7 +1,7 @@
 package com.elice.showpet.comment.entity;
 
 import com.elice.showpet.article.entity.Article;
-import com.elice.showpet.member.entity.Member;
+import com.elice.showpet.member.persistence.MemberEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -33,9 +33,9 @@ public class Comment {
   private LocalDateTime updatedAt;
 
   @ManyToOne
-  @JoinColumn(name = "userId", nullable = false)
+  @JoinColumn(name = "memberId", nullable = false)
   @ToString.Exclude
-  private Member member;
+  private MemberEntity member;
 
   @ManyToOne
   @JoinColumn(name = "articleId", nullable = false)

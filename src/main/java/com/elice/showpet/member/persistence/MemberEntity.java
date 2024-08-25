@@ -1,9 +1,11 @@
-package com.elice.showpet.member.entity;
+package com.elice.showpet.member.persistence;
 
 import com.elice.showpet.article.entity.Article;
 import com.elice.showpet.category.entity.Category;
 import com.elice.showpet.comment.entity.Comment;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -16,21 +18,19 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @ToString
-public class Member {
+public class MemberEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  Long id;
+  private Long id;
 
   @Column(nullable = false, unique = true, length = 20)
-  String login_id;
+  private String loginId;
 
   @Column(nullable = false)
-  String login_pw;
+  private String loginPw;
 
   @Column(nullable = false, unique = true, length = 20)
-  String nickname;
-
-  String email;
+  private String nickname;
 
   @OneToMany(mappedBy = "member")
   @ToString.Exclude

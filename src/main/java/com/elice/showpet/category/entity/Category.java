@@ -1,7 +1,7 @@
 package com.elice.showpet.category.entity;
 
 import com.elice.showpet.article.entity.Article;
-import com.elice.showpet.member.entity.Member;
+import com.elice.showpet.member.persistence.MemberEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -39,9 +39,11 @@ public class Category {
   private List<Article> articles = new ArrayList<>();
 
   @ManyToOne
-  @JoinColumn(name = "userId")
+  @JoinColumn(name = "memberId")
   @ToString.Exclude
-  private Member member;
+
+  private MemberEntity member;
+
 
   @Builder
   public Category(String title, String content) {

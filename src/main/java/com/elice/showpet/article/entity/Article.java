@@ -2,7 +2,7 @@ package com.elice.showpet.article.entity;
 
 import com.elice.showpet.category.entity.Category;
 import com.elice.showpet.comment.entity.Comment;
-import com.elice.showpet.member.entity.Member;
+import com.elice.showpet.member.persistence.MemberEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -40,10 +40,10 @@ public class Article {
   @LastModifiedDate
   private LocalDateTime updatedAt;
 
+
   @ManyToOne
-  @JoinColumn(nullable = false, name = "userId")
-  @ToString.Exclude
-  private Member member;
+  @JoinColumn(name = "member_id", nullable = false)
+  private MemberEntity member;
 
   @ManyToOne
   @JoinColumn(name = "categoryId")

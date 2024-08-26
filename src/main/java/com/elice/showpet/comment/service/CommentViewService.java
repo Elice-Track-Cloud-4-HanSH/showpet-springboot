@@ -2,10 +2,12 @@ package com.elice.showpet.comment.service;
 
 import com.elice.showpet.comment.dto.CommentRequestDto;
 import com.elice.showpet.comment.entity.Comment;
+import com.elice.showpet.comment.exception.CommentNotFoundException;
 import com.elice.showpet.comment.mapper.CommentMapper;
 import com.elice.showpet.comment.repository.CommentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,24 +30,29 @@ public class CommentViewService {
     }
 
     // 댓글 생성
+    @Transactional
     public void createComment(Long articleId, CommentRequestDto commentRequestDto) {
         Comment comment = commentMapper.commentRequestDtoToComment(commentRequestDto);
-        commentRepository.saveComment(articleId, comment);
+        commentRepository.upsertComment(articleId, comment);
     }
 
     // 댓글 수정
-    public void updateComment(Long commentId, CommentRequestDto commentRequestDto) throws Exception {
-        Comment comment = commentRepository.getComment(commentId).orElseThrow(() -> new Exception("댓글을 찾을 수 없습니다."));
+    @Transactional
+    public void updateComment(Long commentId, CommentRequestDto commentRequestDto) {
+        Comment comment = commentRepository.getComment(commentId).
+                orElseThrow(() -> new CommentNotFoundException("not found comment: " + commentId));
 
         Optional.ofNullable(commentRequestDto.getContent())
                 .ifPresent(comment::setContent);
 
-        commentRepository.saveComment(comment);
+        commentRepository.upsertComment(comment);
     }
 
     // 댓글 삭제
-    public void deleteComment(Long commentId) throws Exception {
-        Comment comment = commentRepository.getComment(commentId).orElseThrow(() -> new Exception("댓글을 찾을 수 없습니다."));
+    @Transactional
+    public void deleteComment(Long commentId) {
+        Comment comment = commentRepository.getComment(commentId)
+                .orElseThrow(() -> new CommentNotFoundException("not found comment: " + commentId));
         commentRepository.deleteComment(comment);
     }
 }

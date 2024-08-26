@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString
+@ToString(exclude = {"member", "article"})
 @EntityListeners(AuditingEntityListener.class)
 public class Comment {
   @Id
@@ -33,12 +33,10 @@ public class Comment {
   private LocalDateTime updatedAt;
 
   @ManyToOne
-  @JoinColumn(name = "memberId", nullable = false)
-  @ToString.Exclude
+  @JoinColumn(name = "member_id")
   private MemberEntity member;
 
   @ManyToOne
-  @JoinColumn(name = "articleId", nullable = false)
-  @ToString.Exclude
+  @JoinColumn(name = "article_id", nullable = false)
   private Article article;
 }

@@ -45,7 +45,7 @@ public class CommentRepositoryImpl implements CommentRepository {
     }
 
     @Override
-    public Comment saveComment(Comment comment) {
+    public Comment upsertComment(Comment comment) {
         if (comment.getId() == null) {
             String insertSql = "INSERT INTO comment (content, created_at, updated_at) VALUES (?, ?, ?)";
             KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -71,7 +71,7 @@ public class CommentRepositoryImpl implements CommentRepository {
     }
 
     @Override
-    public Comment saveComment(Long articleId, Comment comment) {
+    public Comment upsertComment(Long articleId, Comment comment) {
         if (comment.getId() == null) {
             String insertSql = "INSERT INTO comment (content, created_at, updated_at, article_id) VALUES (?, ?, ?, ?)";
             KeyHolder keyHolder = new GeneratedKeyHolder();

@@ -1,9 +1,9 @@
 package com.elice.showpet.article.service;
 
 import com.elice.showpet.article.entity.Article;
-import com.elice.showpet.article.entity.CreateArticleDto;
-import com.elice.showpet.article.entity.ResponseArticleDto;
-import com.elice.showpet.article.entity.UpdateArticleDto;
+import com.elice.showpet.article.dto.CreateArticleDto;
+import com.elice.showpet.article.dto.ResponseArticleDto;
+import com.elice.showpet.article.dto.UpdateArticleDto;
 import com.elice.showpet.article.mapper.ArticleMapper;
 import com.elice.showpet.article.repository.ArticleJdbcTemplateRepository;
 import org.springframework.beans.factory.annotation.Autowired;

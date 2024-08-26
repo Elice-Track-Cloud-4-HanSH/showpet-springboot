@@ -1,8 +1,8 @@
 package com.elice.showpet.article.controller;
 
-import com.elice.showpet.article.entity.CreateArticleDto;
-import com.elice.showpet.article.entity.ResponseArticleDto;
-import com.elice.showpet.article.entity.UpdateArticleDto;
+import com.elice.showpet.article.dto.CreateArticleDto;
+import com.elice.showpet.article.dto.ResponseArticleDto;
+import com.elice.showpet.article.dto.UpdateArticleDto;
 import com.elice.showpet.article.service.ArticleRestService;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;

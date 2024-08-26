@@ -1,4 +1,4 @@
-package com.elice.showpet.article.entity;
+package com.elice.showpet.article.dto;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -1,9 +1,9 @@
 package com.elice.showpet.article.mapper;
 
 import com.elice.showpet.article.entity.Article;
-import com.elice.showpet.article.entity.CreateArticleDto;
-import com.elice.showpet.article.entity.ResponseArticleDto;
-import com.elice.showpet.article.entity.UpdateArticleDto;
+import com.elice.showpet.article.dto.CreateArticleDto;
+import com.elice.showpet.article.dto.ResponseArticleDto;
+import com.elice.showpet.article.dto.UpdateArticleDto;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")

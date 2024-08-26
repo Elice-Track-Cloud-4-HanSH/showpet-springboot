@@ -11,9 +11,9 @@ public interface CommentRepository {
 
     Optional<Comment> getComment(Long commentId);
 
-    Comment saveComment(Comment comment);
+    Comment upsertComment(Comment comment);
 
-    Comment saveComment(Long articleId, Comment comment);
+    Comment upsertComment(Long articleId, Comment comment);
 
     void deleteComment(Comment comment);
 

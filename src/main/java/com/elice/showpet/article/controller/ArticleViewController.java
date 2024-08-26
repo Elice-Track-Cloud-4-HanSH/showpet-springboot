@@ -14,7 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -37,12 +36,6 @@ public class ArticleViewController {
     this.s3BucketService = s3Service;
   }
 
-  @GetMapping
-  public String getArticles(Model model) {
-    List<Article> articles = articleViewService.getAllArticles();
-
-    return "article/article";
-  }
 
   @GetMapping("/{id}")
   public String getArticle(
@@ -55,7 +48,6 @@ public class ArticleViewController {
 
       // 댓글 리스트 조회
       List<Comment> comments = commentViewService.getAllComments(id);
-      article.setComments(comments);
       model.addAttribute("comments", comments);
 
       return "article/article";
@@ -65,7 +57,11 @@ public class ArticleViewController {
   }
 
   @GetMapping("/add")
-  public String addArticleForm(Model model) {
+  public String addArticleForm(
+    @RequestParam("category-id") Long categoryId,
+    Model model
+  ) {
+    model.addAttribute("categoryId", categoryId);
     return "article/createArticle";
   }
 

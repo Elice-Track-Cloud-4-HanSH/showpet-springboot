@@ -9,6 +9,8 @@ public interface JdbcTemplateRepository {
 
   List<Article> findAll();
 
+  List<Article> findPagenated(int categoryId, int page, int pageSize);
+
   Optional<Article> findById(Long id);
 
   Article save(Article article);

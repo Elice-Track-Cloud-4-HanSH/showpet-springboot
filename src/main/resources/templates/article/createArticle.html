@@ -45,7 +45,7 @@
         <h1 class="text-center">게시글 추가</h1>
       </div>
       <form
-        th:action="@{/articles/add(boardId=${boardId})}"
+        th:action="@{/articles/add}"
         method="post"
         enctype="multipart/form-data"
       >
@@ -94,6 +94,8 @@
         >
           취소
         </button>
+
+        <input type="hidden" id="categoryId" name="categoryId" th:value="${categoryId}"/>
       </form>
     </div>
 

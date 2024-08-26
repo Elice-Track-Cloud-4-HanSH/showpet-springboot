@@ -1,8 +1,8 @@
 package com.elice.showpet.article.service;
 
 import com.elice.showpet.article.entity.Article;
-import com.elice.showpet.article.entity.CreateArticleDto;
-import com.elice.showpet.article.entity.UpdateArticleDto;
+import com.elice.showpet.article.dto.CreateArticleDto;
+import com.elice.showpet.article.dto.UpdateArticleDto;
 import com.elice.showpet.article.mapper.ArticleMapper;
 import com.elice.showpet.article.repository.ArticleJdbcTemplateRepository;
 import com.elice.showpet.article.repository.JdbcTemplateRepository;
@@ -77,10 +77,11 @@ public class ArticleViewService {
     return articleRepository.save(findArticle);
   }
 
-  public void deleteArticle(Long id) throws Exception {
+  public Long deleteArticle(Long id) throws Exception {
     Article article = getArticle(id);
     articleRepository.delete(article);
     removeImage(article.getImage());
+    return article.getCategory().getId();
   }
 
   public void removeImage(String image) {

@@ -2,10 +2,14 @@ package com.elice.showpet.article.entity;
 
 import com.elice.showpet.category.entity.Category;
 import com.elice.showpet.comment.entity.Comment;
-import com.elice.showpet.common.entity.BaseTimeEntity;
-import com.elice.showpet.member.persistence.MemberEntity;
+import com.elice.showpet.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,8 +18,10 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @ToString
-public class Article extends BaseTimeEntity {
+@EntityListeners(AuditingEntityListener.class)
+public class Article {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
@@ -29,9 +35,16 @@ public class Article extends BaseTimeEntity {
   @Column(length = 1000)
   private String image;
 
+  @CreatedDate
+  private LocalDateTime createdAt;
+
+  @LastModifiedDate
+  private LocalDateTime updatedAt;
+
   @ManyToOne
-  @JoinColumn(name = "member_id", nullable = false)
-  private MemberEntity member;
+  @JoinColumn(name = "userId")
+  @ToString.Exclude
+  private Member member;
 
   @ManyToOne
   @JoinColumn(name = "categoryId")
@@ -45,8 +58,4 @@ public class Article extends BaseTimeEntity {
   )
   @ToString.Exclude
   private List<Comment> comments = new ArrayList<>();
-
-  public static ArticleBuilder builder() {
-    return new ArticleBuilder();
-  }
 }

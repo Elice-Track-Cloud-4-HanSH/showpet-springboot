@@ -1,7 +1,6 @@
 package com.elice.showpet.comment.controller;
 
 import com.elice.showpet.comment.dto.CommentRequestDto;
-import com.elice.showpet.comment.exception.CommentNotFoundException;
 import com.elice.showpet.comment.service.CommentViewService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -35,10 +34,12 @@ public class CommentViewController {
             @PathVariable("commentId") Long commentId,
             @RequestParam("articleId") Long articleId,
             @ModelAttribute CommentRequestDto commentRequestDto) {
-
-        commentViewService.updateComment(commentId, commentRequestDto);
-        return "redirect:/articles/" + articleId;
-
+        try {
+            commentViewService.updateComment(commentId, commentRequestDto);
+            return "redirect:/articles/" + articleId;
+        } catch (Exception e) {
+            return "error";
+        }
     }
 
     // 댓글 삭제
@@ -49,14 +50,9 @@ public class CommentViewController {
         try {
             commentViewService.deleteComment(commentId);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT); // 204 No Content
-        } catch (CommentNotFoundException e) {
+        } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-    }
-
-    @ExceptionHandler(CommentNotFoundException.class)
-    private String handleCommentNotFoundException() {
-        return "error";
     }
 
 }

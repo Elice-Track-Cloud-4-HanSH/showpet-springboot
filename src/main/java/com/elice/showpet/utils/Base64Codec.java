@@ -1,4 +1,4 @@
-package com.elice.showpet.common.utils;
+package com.elice.showpet.utils;
 
 import org.springframework.web.multipart.MultipartFile;
 

@@ -1,7 +1,7 @@
 package com.elice.showpet.comment.entity;
 
 import com.elice.showpet.article.entity.Article;
-import com.elice.showpet.member.persistence.MemberEntity;
+import com.elice.showpet.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString(exclude = {"member", "article"})
+@ToString
 @EntityListeners(AuditingEntityListener.class)
 public class Comment {
   @Id
@@ -33,10 +33,12 @@ public class Comment {
   private LocalDateTime updatedAt;
 
   @ManyToOne
-  @JoinColumn(name = "member_id")
-  private MemberEntity member;
+  @JoinColumn(name = "userId", nullable = false)
+  @ToString.Exclude
+  private Member member;
 
   @ManyToOne
-  @JoinColumn(name = "article_id", nullable = false)
+  @JoinColumn(name = "articleId", nullable = false)
+  @ToString.Exclude
   private Article article;
 }

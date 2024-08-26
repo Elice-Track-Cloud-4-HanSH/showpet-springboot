@@ -3,6 +3,7 @@ package com.elice.showpet.article.repository;
 import com.elice.showpet.article.entity.Article;
 import com.elice.showpet.category.entity.Category;
 import com.elice.showpet.category.repository.CategoryRepository;
+import com.elice.showpet.member.entity.Member;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 

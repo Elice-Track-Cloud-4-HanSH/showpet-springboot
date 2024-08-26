@@ -43,8 +43,10 @@
       function showPreviewImage(input) {
         const previewSection = document.getElementById("preview-section");
         const preview = document.getElementById('preview')
+        const imgDeleteBtn = document.getElementById('img-delete-btn')
         if (input.files && input.files[0]) {
           previewSection.style.display = "block";
+          imgDeleteBtn.style.display = "block";
           let reader = new FileReader();
           reader.onload = (e) => {
             preview.src = e.target.result;
@@ -63,6 +65,8 @@
         const previewSection = document.getElementById("preview-section");
         const deleteFlagText = document.getElementById("deleted");
         const preview = document.getElementById('preview');
+        const fileSection = document.getElementById('fileInput');
+        fileSection.value = null;
         deleteFlagText.value = "t";
         preview.src = "#";
         previewSection.style.display = "none";
@@ -114,7 +118,15 @@
                   onchange="showPreviewImage(this)"
           />
         </div>
-        <div class="mb-3 icon-container" id="preview-section">
+        <div
+                class="mb-3 icon-container"
+                id="preview-section"
+                th:style="${
+                  article.image == null || article.image == ''
+                  ? 'display: none;'
+                  : 'display: block;'
+                }"
+        >
           <img
                   th:src="@{/image/x.svg}"
                   class="overlay"
@@ -126,11 +138,6 @@
                   id="preview"
                   th:src="${article.image}"
                   alt="미리보기 이미지"
-                  th:style="${
-                      article.image == null || article.image == ''
-                      ? 'display: none;'
-                      : 'display: block; max-width: 100%; height: auto;'
-                      }"
           >
         </div>
 

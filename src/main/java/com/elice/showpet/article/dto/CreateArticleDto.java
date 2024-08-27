@@ -22,4 +22,6 @@ public class CreateArticleDto {
 
     @Min(value = 1, message = "카테고리 id는 필수값입니다.")
     private Long categoryId;
+
+    private String password;
 }

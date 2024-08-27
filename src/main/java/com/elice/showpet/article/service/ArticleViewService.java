@@ -12,6 +12,8 @@ import com.elice.showpet.aws.s3.service.S3BucketService;
 import com.elice.showpet.category.entity.Category;
 import com.elice.showpet.category.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,6 +29,8 @@ public class ArticleViewService {
 
     private final CategoryService categoryService;
 
+    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
     @Autowired
     public ArticleViewService(
             ArticleMapper articleMapper,
@@ -38,6 +42,17 @@ public class ArticleViewService {
         this.articleRepository = articleRepository;
         this.s3BucketService = s3BucketService;
         this.categoryService = categoryService;
+    }
+
+    public boolean verifyPassword(Long articleId, String password) {
+        if (password == null) return false;
+
+        Article article = this.getArticle(articleId);
+        return passwordEncoder.matches(password, article.getAnonPassword());
+    }
+
+    public String encryptPassword(String password) {
+        return passwordEncoder.encode(password);
     }
 
     public List<Article> getAllArticles() {
@@ -53,6 +68,9 @@ public class ArticleViewService {
     }
 
     public Article createArticle(CreateArticleDto articleDto) {
+        if (articleDto.getPassword() != null) {
+            articleDto.setPassword(encryptPassword(articleDto.getPassword()));
+        }
         Article created = articleMapper.toEntity(articleDto);
         Category category = categoryService.findById(articleDto.getCategoryId());
         created.setCategory(category);

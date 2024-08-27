@@ -123,6 +123,9 @@ public class ArticleViewController {
         if (error.hasErrors()) {
             return "redirect:/articles/edit/{id}";
         }
+        if (!articleViewService.verifyPassword(id, articleDto.getPassword())) {
+            return "error";
+        }
         try {
             if (Objects.requireNonNull(file.getContentType()).startsWith("image")) {
                 String imageUrl = s3BucketService.uploadFile(file);

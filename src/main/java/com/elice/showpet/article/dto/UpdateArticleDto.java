@@ -18,4 +18,5 @@ public class UpdateArticleDto {
     private String content;
     private String image;
     private String imageDeleted;
+    private String password;
 }

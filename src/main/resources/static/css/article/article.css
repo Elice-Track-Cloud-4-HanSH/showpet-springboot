@@ -1,0 +1,15 @@
+html, body {
+    font-family: "Elice DX Neolli", sans-serif;
+}
+
+.dropdown-toggle:after {
+    content: none;
+}
+
+.comment .btn-group {
+    display: none;
+}
+
+.comment:hover .btn-group {
+    display: flex;
+}

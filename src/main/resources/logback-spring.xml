@@ -25,7 +25,7 @@
         <appender-ref ref="STDOUT" />
     </root>
 
-    <logger name="com.elice.boardproject.board.controller" level="DEBUG">
+    <logger name="com.elice.showpet.article.aop">
         <appender-ref ref="FILE" />
     </logger>
 

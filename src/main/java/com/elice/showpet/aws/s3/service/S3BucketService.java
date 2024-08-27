@@ -33,7 +33,19 @@ public class S3BucketService {
     }
   }
 
-  public void deleteFile(String fileName) {
+  public String uploadFile(MultipartFile file, String path) throws IOException {
+    String fileName = (path.endsWith("/") ? path : path + "/") + makeHashedFileName(file);
+    String fileUrl = bucketUrl + fileName;
+    ObjectMetadata metadata =  createFileMetadata(file);
+    try {
+      s3Client.putObject(bucketName, fileName, file.getInputStream(), metadata);
+      return fileUrl;
+    } catch (IOException e) {
+      throw new IOException(e.getMessage());
+    }
+  }
+
+  public void deleteFile(String fileName) throws Exception {
     if (fileName.startsWith("https")) {
       fileName = fileName.substring(bucketUrl.length());
     }

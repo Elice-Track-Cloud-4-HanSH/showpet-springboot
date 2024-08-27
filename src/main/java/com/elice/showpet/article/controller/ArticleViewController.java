@@ -58,7 +58,7 @@ public class ArticleViewController {
 
   @GetMapping("/add")
   public String addArticleForm(
-    @RequestParam("category-id") Long categoryId,
+    @RequestParam("categoryId") Long categoryId,
     Model model
   ) {
     model.addAttribute("categoryId", categoryId);
@@ -128,7 +128,7 @@ public class ArticleViewController {
   ) {
     try {
       articleViewService.deleteArticle(id);
-      return "redirect:/boards";
+      return "redirect:/category/{categoryId}";
     } catch (Exception e) {
       return "error";
     }

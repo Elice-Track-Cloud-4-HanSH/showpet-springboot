@@ -48,11 +48,15 @@ public class CategoryService {
                 .ifPresent(category::setContent);
         Optional.ofNullable(request.getImage())
                 .ifPresent((image) -> {
-                    s3BucketService.deleteFile(category.getImage().replace("https://showpet.s3.ap-northeast-2.amazonaws.com/", ""));
+                    Optional.ofNullable(category.getImage()).ifPresent(this::removeImage);
                     category.setImage(image);
                 });
         category.update(request.getTitle(), request.getContent());
 
         return category;
     }
+    public void removeImage(String image) {
+        s3BucketService.deleteFile(image);
+    }
 }
+

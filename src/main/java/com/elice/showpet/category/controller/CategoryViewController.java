@@ -111,11 +111,20 @@ public class CategoryViewController {
         }
     }
 
+
     @GetMapping("/{id}")
-    public String getArticle(@PathVariable("id") long id, Model model) {
+    public String getCategory(@PathVariable("id") int id,
+                              @RequestParam(value = "page", defaultValue = "0") int page,
+                              @RequestParam(value = "size", defaultValue = "10") int size,
+                              Model model) {
         try {
             Category category = categoryService.findById(id);
-            model.addAttribute("category",category);
+            List<Article> articles = articleViewService.getPagenatedArticles(id, page, size);
+
+            model.addAttribute("category", new CategoryViewResponse(category));
+            model.addAttribute("articles", articles);
+            model.addAttribute("currentPage", page);
+            model.addAttribute("pageSize", size);
 
             return "category/board";
         } catch (Exception e) {

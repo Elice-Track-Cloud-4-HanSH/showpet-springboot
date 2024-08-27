@@ -1,12 +1,14 @@
 package com.elice.showpet.comment.service;
 
+import com.elice.showpet.article.entity.Article;
+import com.elice.showpet.article.repository.ArticleJdbcTemplateRepository;
 import com.elice.showpet.comment.dto.CommentRequestDto;
 import com.elice.showpet.comment.dto.CommentResponseDto;
 import com.elice.showpet.comment.entity.Comment;
 import com.elice.showpet.comment.exception.CommentNotFoundException;
 import com.elice.showpet.comment.mapper.CommentMapper;
 import com.elice.showpet.comment.repository.CommentRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,19 +17,18 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class CommentService {
 
-    private final CommentRepository commentRepository;
     private final CommentMapper commentMapper;
-
-    @Autowired
-    public CommentService(CommentRepository commentRepository, CommentMapper commentMapper) {
-        this.commentRepository = commentRepository;
-        this.commentMapper = commentMapper;
-    }
+    private final CommentRepository commentRepository;
+    private final ArticleJdbcTemplateRepository articleRepository;
 
     // 전체 댓글 조회
     public List<CommentResponseDto> getAllComments(Long articleId) {
+        articleRepository.findById(articleId)
+                .orElseThrow(() -> new IllegalArgumentException("not found article: " + articleId));
         List<Comment> comments = commentRepository.getAllComments(articleId);
         return comments.stream()
                 .map(commentMapper::commentToCommentResponseDto)
@@ -44,8 +45,13 @@ public class CommentService {
     // 댓글 생성
     @Transactional
     public CommentResponseDto createComment(Long articleId, CommentRequestDto commentRequestDto) {
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> new IllegalArgumentException("not found article: " + articleId));
+
         Comment comment = commentMapper.commentRequestDtoToComment(commentRequestDto);
-        Comment createdComment = commentRepository.upsertComment(articleId, comment);
+        comment.setArticle(article);
+
+        Comment createdComment = commentRepository.upsertComment(comment);
         return commentMapper.commentToCommentResponseDto(createdComment);
     }
 

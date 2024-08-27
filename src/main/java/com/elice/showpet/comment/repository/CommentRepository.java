@@ -13,8 +13,6 @@ public interface CommentRepository {
 
     Comment upsertComment(Comment comment);
 
-    Comment upsertComment(Long articleId, Comment comment);
-
     void deleteComment(Comment comment);
 
 }

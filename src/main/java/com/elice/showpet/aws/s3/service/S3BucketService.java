@@ -2,6 +2,7 @@ package com.elice.showpet.aws.s3.service;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.elice.showpet.common.exception.BucketFileNotDeletedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -45,11 +46,15 @@ public class S3BucketService {
     }
   }
 
-  public void deleteFile(String fileName) throws Exception {
+  public void deleteFile(String fileName) throws BucketFileNotDeletedException {
     if (fileName.startsWith("https")) {
       fileName = fileName.substring(bucketUrl.length());
     }
-    s3Client.deleteObject(bucketName, fileName);
+    try {
+      s3Client.deleteObject(bucketName, fileName);
+    } catch (Exception e) {
+      throw new BucketFileNotDeletedException("S3 버킷의 파일이 삭제되지 않았습니다.");
+    }
   }
 
   private String makeHashedFileName(MultipartFile file) {

@@ -2,12 +2,11 @@ package com.elice.showpet.article.controller;
 
 import com.elice.showpet.article.dto.CreateArticleDto;
 import com.elice.showpet.article.dto.UpdateArticleDto;
-import com.elice.showpet.article.entity.*;
+import com.elice.showpet.article.entity.Article;
 import com.elice.showpet.article.service.ArticleViewService;
 import com.elice.showpet.aws.s3.service.S3BucketService;
-import com.elice.showpet.comment.entity.Comment;
+import com.elice.showpet.comment.dto.CommentResponseDto;
 import com.elice.showpet.comment.service.CommentViewService;
-import jakarta.validation.constraints.Min;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -55,7 +54,7 @@ public class ArticleViewController {
             model.addAttribute("article", article);
 
             // 댓글 리스트 조회
-            List<Comment> comments = commentViewService.getAllComments(id);
+            List<CommentResponseDto> comments = commentViewService.getAllComments(id);
             model.addAttribute("comments", comments);
 
             return "article/article";

@@ -120,11 +120,16 @@
           <div class="input-group">
             <textarea
               class="form-control"
+              id="commentContent"
               name="content"
               cols="6"
               placeholder="댓글 작성하기"
+              maxlength="1000"
             ></textarea>
             <button class="btn btn-primary">업로드</button>
+          </div>
+          <div th:if="${errorMessage != null}">
+            <p th:text="'&#9757; ' + ${errorMessage} + ' &#128064;'" class="text-danger"></p>
           </div>
         </form>
 
@@ -240,6 +245,8 @@
                 name="content"
                 id="commentContentTextarea"
                 placeholder="댓글 수정하기..."
+                maxlength="1000"
+                required
               ></textarea>
             </div>
             <div class="modal-footer">
@@ -352,6 +359,12 @@
         document
           .getElementById("commentEditForm")
           .setAttribute("action", `/comments/edit/${commentId}?articleId=${articleId}`);
+      }
+
+      let errorMessage = [[${errorMessage}]];
+      if(errorMessage) {
+        let commentContent = document.getElementById('commentContent');
+        commentContent.focus();
       }
     </script>
   </body>

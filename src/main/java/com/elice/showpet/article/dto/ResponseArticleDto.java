@@ -8,10 +8,10 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class ResponseArticleDto {
-  private Long id;
-  private String title;
-  private String content;
-  private String image;
-  private LocalDateTime createdAt;
-  private LocalDateTime updatedAt;
+    private Long id;
+    private String title;
+    private String content;
+    private String image;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

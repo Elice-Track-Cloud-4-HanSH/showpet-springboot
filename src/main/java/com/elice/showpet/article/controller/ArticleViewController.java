@@ -26,132 +26,132 @@ import java.util.Objects;
 @NoArgsConstructor
 @RequestMapping("/articles")
 public class ArticleViewController {
-  private ArticleViewService articleViewService;
-  private S3BucketService s3BucketService;
-  private CommentViewService commentViewService;
+    private ArticleViewService articleViewService;
+    private S3BucketService s3BucketService;
+    private CommentViewService commentViewService;
 
-  @Autowired
-  public ArticleViewController(
-    ArticleViewService articleViewService,
-    CommentViewService commentViewService,
-    S3BucketService s3Service
-  ) {
-    this.articleViewService = articleViewService;
-    this.commentViewService = commentViewService;
-    this.s3BucketService = s3Service;
-  }
-
-
-  @GetMapping("/{id}")
-  public String getArticle(
-    @PathVariable("id") Long id,
-    Model model
-  ) {
-    if (id < 1) {
-      return "redirect:/category";
+    @Autowired
+    public ArticleViewController(
+            ArticleViewService articleViewService,
+            CommentViewService commentViewService,
+            S3BucketService s3Service
+    ) {
+        this.articleViewService = articleViewService;
+        this.commentViewService = commentViewService;
+        this.s3BucketService = s3Service;
     }
-    try {
-      Article article = articleViewService.getArticle(id);
-      model.addAttribute("article", article);
 
-      // 댓글 리스트 조회
-      List<Comment> comments = commentViewService.getAllComments(id);
-      model.addAttribute("comments", comments);
 
-      return "article/article";
-    } catch (Exception e) {
-      return "redirect:/category";
-    }
-  }
+    @GetMapping("/{id}")
+    public String getArticle(
+            @PathVariable("id") Long id,
+            Model model
+    ) {
+        if (id < 1) {
+            return "redirect:/category";
+        }
+        try {
+            Article article = articleViewService.getArticle(id);
+            model.addAttribute("article", article);
 
-  @GetMapping("/add")
-  public String addArticleForm(
-    @RequestParam(value = "category-id", required = false) Long categoryId,
-    Model model
-  ) {
-    categoryId = Objects.isNull(categoryId) ? 1 : categoryId;
-    model.addAttribute("categoryId", categoryId);
-    return "article/createArticle";
-  }
+            // 댓글 리스트 조회
+            List<Comment> comments = commentViewService.getAllComments(id);
+            model.addAttribute("comments", comments);
 
-  @PostMapping("/add")
-  public String addArticle(
-    @Validated @ModelAttribute CreateArticleDto articleDto,
-    @RequestParam("file") MultipartFile file,
-    RedirectAttributes redirectAttributes,
-    Errors errors
-  ) {
-    try {
-      if (Objects.requireNonNull(file.getContentType()).startsWith("image")) {
-        String imageUrl = s3BucketService.uploadFile(file, "article");
-        articleDto.setImage(imageUrl);
-      }
-      Article article = articleViewService.createArticle(articleDto);
-      redirectAttributes.addAttribute("id", article.getId());
-      return "redirect:/articles/{id}";
-    } catch (IOException e) {
-      return "redirect:/articles/add";
+            return "article/article";
+        } catch (Exception e) {
+            return "redirect:/category";
+        }
     }
-  }
 
-  @GetMapping("/edit/{id}")
-  public String editArticleForm(
-    @PathVariable("id") Long id,
-    Model model
-  ) {
-    if (id < 1) {
-      return "redirect:/category";
+    @GetMapping("/add")
+    public String addArticleForm(
+            @RequestParam(value = "category-id", required = false) Long categoryId,
+            Model model
+    ) {
+        categoryId = Objects.isNull(categoryId) ? 1 : categoryId;
+        model.addAttribute("categoryId", categoryId);
+        return "article/createArticle";
     }
-    try {
-      Article article = articleViewService.getArticle(id);
-      model.addAttribute("article", article);
-      return "article/editArticle";
-    } catch (Exception e) {
-      return "redirect:/category";
-    }
-  }
 
-  @PostMapping("/edit/{id}")
-  public String editArticle(
-    @Validated @ModelAttribute UpdateArticleDto articleDto,
-    @RequestParam("file") MultipartFile file,
-    @PathVariable("id") Long id,
-    RedirectAttributes redirectAttributes,
-    Errors error
-  ) {
-    redirectAttributes.addAttribute("id", id);
-    if (error.hasErrors()) {
-      return "redirect:/articles/edit/{id}";
+    @PostMapping("/add")
+    public String addArticle(
+            @Validated @ModelAttribute CreateArticleDto articleDto,
+            @RequestParam("file") MultipartFile file,
+            RedirectAttributes redirectAttributes,
+            Errors errors
+    ) {
+        try {
+            if (Objects.requireNonNull(file.getContentType()).startsWith("image")) {
+                String imageUrl = s3BucketService.uploadFile(file, "article");
+                articleDto.setImage(imageUrl);
+            }
+            Article article = articleViewService.createArticle(articleDto);
+            redirectAttributes.addAttribute("id", article.getId());
+            return "redirect:/articles/{id}";
+        } catch (IOException e) {
+            return "redirect:/articles/add";
+        }
     }
-    try {
-      if (Objects.requireNonNull(file.getContentType()).startsWith("image")) {
-        String imageUrl = s3BucketService.uploadFile(file);
-        articleDto.setImage(imageUrl);
-      }
-      Article article = articleViewService.updateArticle(id, articleDto);
 
-      redirectAttributes.addFlashAttribute("message", "게시글이 수정되었습니다.");
-      return "redirect:/articles/{id}";
-    } catch (Exception e) {
-      return "redirect:/articles/edit/{id}";
+    @GetMapping("/edit/{id}")
+    public String editArticleForm(
+            @PathVariable("id") Long id,
+            Model model
+    ) {
+        if (id < 1) {
+            return "redirect:/category";
+        }
+        try {
+            Article article = articleViewService.getArticle(id);
+            model.addAttribute("article", article);
+            return "article/editArticle";
+        } catch (Exception e) {
+            return "redirect:/category";
+        }
     }
-  }
 
-  @DeleteMapping("/{id}")
-  public String deleteArticle(
-    @PathVariable("id") Long id,
-    RedirectAttributes redirectAttributes
-  ) {
-    if (id < 1) {
-      return "redirect:/category";
+    @PostMapping("/edit/{id}")
+    public String editArticle(
+            @Validated @ModelAttribute UpdateArticleDto articleDto,
+            @RequestParam("file") MultipartFile file,
+            @PathVariable("id") Long id,
+            RedirectAttributes redirectAttributes,
+            Errors error
+    ) {
+        redirectAttributes.addAttribute("id", id);
+        if (error.hasErrors()) {
+            return "redirect:/articles/edit/{id}";
+        }
+        try {
+            if (Objects.requireNonNull(file.getContentType()).startsWith("image")) {
+                String imageUrl = s3BucketService.uploadFile(file);
+                articleDto.setImage(imageUrl);
+            }
+            Article article = articleViewService.updateArticle(id, articleDto);
+
+            redirectAttributes.addFlashAttribute("message", "게시글이 수정되었습니다.");
+            return "redirect:/articles/{id}";
+        } catch (Exception e) {
+            return "redirect:/articles/edit/{id}";
+        }
     }
-    try {
-      Long categoryId = articleViewService.deleteArticle(id);
-      redirectAttributes.addAttribute("categoryId", categoryId);
-      return "redirect:/category/{categoryId}";
-    } catch (Exception e) {
-      redirectAttributes.addAttribute("id", id);
-      return "redirect:/articles/{id}";
+
+    @DeleteMapping("/{id}")
+    public String deleteArticle(
+            @PathVariable("id") Long id,
+            RedirectAttributes redirectAttributes
+    ) {
+        if (id < 1) {
+            return "redirect:/category";
+        }
+        try {
+            Long categoryId = articleViewService.deleteArticle(id);
+            redirectAttributes.addAttribute("categoryId", categoryId);
+            return "redirect:/category/{categoryId}";
+        } catch (Exception e) {
+            redirectAttributes.addAttribute("id", id);
+            return "redirect:/articles/{id}";
+        }
     }
-  }
 }

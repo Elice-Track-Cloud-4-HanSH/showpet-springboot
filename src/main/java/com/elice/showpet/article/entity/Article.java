@@ -6,6 +6,7 @@ import com.elice.showpet.common.entity.BaseTimeEntity;
 import com.elice.showpet.member.persistence.MemberEntity;
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,37 +17,37 @@ import java.util.List;
 @AllArgsConstructor
 @ToString
 public class Article extends BaseTimeEntity {
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-  @Column(nullable = false, length = 200)
-  private String title;
+    @Column(nullable = false, length = 200)
+    private String title;
 
-  @Column(nullable = false, length = 10000)
-  private String content;
+    @Column(nullable = false, length = 10000)
+    private String content;
 
-  @Column(length = 1000)
-  private String image;
+    @Column(length = 1000)
+    private String image;
 
-  @ManyToOne
-  @JoinColumn(name = "member_id", nullable = false)
-  private MemberEntity member;
+    @ManyToOne
+    @JoinColumn(name = "member_id")
+    private MemberEntity member;
 
-  @ManyToOne
-  @JoinColumn(name = "categoryId")
-  @ToString.Exclude
-  private Category category;
+    @ManyToOne
+    @JoinColumn(name = "categoryId", nullable = false)
+    @ToString.Exclude
+    private Category category;
 
-  @OneToMany(
-    mappedBy = "article",
-    cascade = CascadeType.ALL,
-    orphanRemoval = true
-  )
-  @ToString.Exclude
-  private List<Comment> comments = new ArrayList<>();
+    @OneToMany(
+            mappedBy = "article",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @ToString.Exclude
+    private List<Comment> comments = new ArrayList<>();
 
-  public static ArticleBuilder builder() {
-    return new ArticleBuilder();
-  }
+    public static ArticleBuilder builder() {
+        return new ArticleBuilder();
+    }
 }

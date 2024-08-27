@@ -12,25 +12,26 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class ArticleAop extends AopUtils {
-  @Pointcut("execution( * com.elice.showpet.article.*.*.*(..))")
-  public void pointcut() {}
+    @Pointcut("execution( * com.elice.showpet.article.*.*.*(..))")
+    public void pointcut() {
+    }
 
-  @Before("pointcut()")
-  public void logBeforeExecute(JoinPoint joinPoint) {
-    String args = argsToString(joinPoint.getArgs());
-    log.info(
-      "method: {}::{}{}",
-      joinPoint.getTarget().getClass().getSimpleName(),
-      joinPoint.getSignature().getName(),
-      args.isEmpty() ? "" : ", args: " + args
-    );
-  }
+    @Before("pointcut()")
+    public void logBeforeExecute(JoinPoint joinPoint) {
+        String args = argsToString(joinPoint.getArgs());
+        log.info(
+                "method: {}::{}{}",
+                joinPoint.getTarget().getClass().getSimpleName(),
+                joinPoint.getSignature().getName(),
+                args.isEmpty() ? "" : ", args: " + args
+        );
+    }
 
-  @AfterThrowing(pointcut = "pointcut()", throwing = "ex")
-  public void logAfterThrowing(JoinPoint joinPoint, Exception ex) {
-    log.error("method: {}::{}, error: {}",
-      joinPoint.getTarget().getClass().getSimpleName(),
-      joinPoint.getSignature().getName(),
-      ex.getMessage());
-  }
+    @AfterThrowing(pointcut = "pointcut()", throwing = "ex")
+    public void logAfterThrowing(JoinPoint joinPoint, Exception ex) {
+        log.error("method: {}::{}, error: {}",
+                joinPoint.getTarget().getClass().getSimpleName(),
+                joinPoint.getSignature().getName(),
+                ex.getMessage());
+    }
 }

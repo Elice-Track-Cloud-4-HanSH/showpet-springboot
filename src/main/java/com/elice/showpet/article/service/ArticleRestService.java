@@ -15,51 +15,51 @@ import java.util.stream.Collectors;
 
 @Service
 public class ArticleRestService {
-  private final ArticleMapper articleMapper;
+    private final ArticleMapper articleMapper;
 
-  private final ArticleJdbcTemplateRepository articleRepository;
+    private final ArticleJdbcTemplateRepository articleRepository;
 
-  @Autowired
-  public ArticleRestService(
-    ArticleMapper articleMapper,
-    ArticleJdbcTemplateRepository articleRepository
-  ) {
-    this.articleMapper = articleMapper;
-    this.articleRepository = articleRepository;
-  }
+    @Autowired
+    public ArticleRestService(
+            ArticleMapper articleMapper,
+            ArticleJdbcTemplateRepository articleRepository
+    ) {
+        this.articleMapper = articleMapper;
+        this.articleRepository = articleRepository;
+    }
 
-  public List<ResponseArticleDto> getAllArticles() {
-    List<Article> articles = articleRepository.findAll();
-    return articles.stream().map(articleMapper::toResponseDto).collect(Collectors.toList());
-  }
+    public List<ResponseArticleDto> getAllArticles() {
+        List<Article> articles = articleRepository.findAll();
+        return articles.stream().map(articleMapper::toResponseDto).collect(Collectors.toList());
+    }
 
-  public ResponseArticleDto getArticle(Long id) throws Exception {
-    Article article = articleRepository.findById(id).orElseThrow(() -> new Exception("Article not found"));
-    return articleMapper.toResponseDto(article);
-  }
+    public ResponseArticleDto getArticle(Long id) throws Exception {
+        Article article = articleRepository.findById(id).orElseThrow(() -> new Exception("Article not found"));
+        return articleMapper.toResponseDto(article);
+    }
 
-  public ResponseArticleDto createArticle(CreateArticleDto articleDto) {
-    Article created = articleMapper.toEntity(articleDto);
-    Article result = articleRepository.save(created);
-    return articleMapper.toResponseDto(result);
-  }
+    public ResponseArticleDto createArticle(CreateArticleDto articleDto) {
+        Article created = articleMapper.toEntity(articleDto);
+        Article result = articleRepository.save(created);
+        return articleMapper.toResponseDto(result);
+    }
 
-  public ResponseArticleDto updateArticle(Long id, UpdateArticleDto articleDto) throws Exception {
-    Article findArticle = articleRepository.findById(id).orElseThrow(() -> new Exception("Article not found"));
+    public ResponseArticleDto updateArticle(Long id, UpdateArticleDto articleDto) throws Exception {
+        Article findArticle = articleRepository.findById(id).orElseThrow(() -> new Exception("Article not found"));
 
-    Optional.ofNullable(articleDto.getTitle())
-      .ifPresent(findArticle::setTitle);
-    Optional.ofNullable(articleDto.getContent())
-      .ifPresent(findArticle::setContent);
-    Optional.ofNullable(articleDto.getImage())
-      .ifPresent(findArticle::setImage);
+        Optional.ofNullable(articleDto.getTitle())
+                .ifPresent(findArticle::setTitle);
+        Optional.ofNullable(articleDto.getContent())
+                .ifPresent(findArticle::setContent);
+        Optional.ofNullable(articleDto.getImage())
+                .ifPresent(findArticle::setImage);
 
-    Article updated = articleRepository.save(findArticle);
-    return articleMapper.toResponseDto(updated);
-  }
+        Article updated = articleRepository.save(findArticle);
+        return articleMapper.toResponseDto(updated);
+    }
 
-  public void deleteArticle(Long id) throws Exception {
-    Article article = articleRepository.findById(id).orElseThrow(() -> new Exception("Article not found"));
-    articleRepository.delete(article);
-  }
+    public void deleteArticle(Long id) throws Exception {
+        Article article = articleRepository.findById(id).orElseThrow(() -> new Exception("Article not found"));
+        articleRepository.delete(article);
+    }
 }

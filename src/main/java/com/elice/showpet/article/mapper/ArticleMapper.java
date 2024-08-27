@@ -8,7 +8,9 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface ArticleMapper {
-  ResponseArticleDto toResponseDto(Article article);
-  Article toEntity(CreateArticleDto dto);
-  Article toEntity(UpdateArticleDto dto);
+    ResponseArticleDto toResponseDto(Article article);
+
+    Article toEntity(CreateArticleDto dto);
+
+    Article toEntity(UpdateArticleDto dto);
 }

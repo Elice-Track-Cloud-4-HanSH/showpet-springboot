@@ -19,97 +19,96 @@ import java.util.Optional;
 
 @Service
 public class ArticleViewService {
-  private final ArticleMapper articleMapper;
+    private final ArticleMapper articleMapper;
 
-  private final JdbcTemplateRepository articleRepository;
+    private final JdbcTemplateRepository articleRepository;
 
-  private final S3BucketService s3BucketService;
+    private final S3BucketService s3BucketService;
 
-  private final CategoryService categoryService;
+    private final CategoryService categoryService;
 
-  @Autowired
-  public ArticleViewService(
-    ArticleMapper articleMapper,
-    ArticleJdbcTemplateRepository articleRepository,
-    S3BucketService s3BucketService,
-    CategoryService categoryService
-  ) {
-    this.articleMapper = articleMapper;
-    this.articleRepository = articleRepository;
-    this.s3BucketService = s3BucketService;
-    this.categoryService = categoryService;
-  }
+    @Autowired
+    public ArticleViewService(
+            ArticleMapper articleMapper,
+            ArticleJdbcTemplateRepository articleRepository,
+            S3BucketService s3BucketService,
+            CategoryService categoryService
+    ) {
+        this.articleMapper = articleMapper;
+        this.articleRepository = articleRepository;
+        this.s3BucketService = s3BucketService;
+        this.categoryService = categoryService;
+    }
 
-  public List<Article> getAllArticles() {
-    return articleRepository.findAll();
-  }
+    public List<Article> getAllArticles() {
+        return articleRepository.findAll();
+    }
 
-  public Article getArticle(Long id) throws EntityNotFoundException {
-    return articleRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Article not found"));
-  }
+    public Article getArticle(Long id) throws EntityNotFoundException {
+        return articleRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Article not found"));
+    }
 
-  public List<Article> getPagenatedArticles(Integer categoryId, Integer page, Integer pageSize) {
-    return articleRepository.findPagenated(categoryId, page, pageSize);
-  }
+    public List<Article> getPagenatedArticles(Integer categoryId, Integer page, Integer pageSize) {
+        return articleRepository.findPagenated(categoryId, page, pageSize);
+    }
 
-  public Article createArticle(CreateArticleDto articleDto) {
-    Article created = articleMapper.toEntity(articleDto);
-    Category category = categoryService.findById(articleDto.getCategoryId());
-    created.setCategory(category);
-    return articleRepository.save(created);
-  }
+    public Article createArticle(CreateArticleDto articleDto) {
+        Article created = articleMapper.toEntity(articleDto);
+        Category category = categoryService.findById(articleDto.getCategoryId());
+        created.setCategory(category);
+        return articleRepository.save(created);
+    }
 
-  public Article updateArticle(Long id, UpdateArticleDto articleDto) throws RuntimeException {
-    try {
-      Article findArticle = getArticle(id);
-      Optional.ofNullable(articleDto.getImageDeleted()).flatMap(_ -> Optional.ofNullable(findArticle.getImage())).ifPresent((str) -> {
+    public Article updateArticle(Long id, UpdateArticleDto articleDto) throws RuntimeException {
         try {
-          removeImage(str);
-        } catch (BucketFileNotDeletedException e) {
-          throw new BucketFileNotDeletedException(e.getMessage());
+            Article findArticle = getArticle(id);
+            Optional.ofNullable(articleDto.getImageDeleted()).flatMap(_ -> Optional.ofNullable(findArticle.getImage())).ifPresent((str) -> {
+                try {
+                    removeImage(str);
+                } catch (BucketFileNotDeletedException e) {
+                    throw new BucketFileNotDeletedException(e.getMessage());
+                }
+                findArticle.setImage(null);
+            });
+            Optional.ofNullable(articleDto.getTitle())
+                    .ifPresent(findArticle::setTitle);
+            Optional.ofNullable(articleDto.getContent())
+                    .ifPresent(findArticle::setContent);
+            Optional.ofNullable(articleDto.getImage())
+                    .ifPresent((image) -> {
+                        String findArticleImage = findArticle.getImage();
+                        if (findArticleImage != null) {
+                            try {
+                                removeImage(findArticleImage);
+                            } catch (RuntimeException e) {
+                                throw new RuntimeException(e.getMessage());
+                            }
+                        }
+                        findArticle.setImage(image);
+                    });
+
+            return articleRepository.save(findArticle);
+        } catch (EntityNotFoundException | BucketFileNotDeletedException e) {
+            throw new RuntimeException(e.getMessage());
         }
-        findArticle.setImage(null);
-      });
-      Optional.ofNullable(articleDto.getTitle())
-        .ifPresent(findArticle::setTitle);
-      Optional.ofNullable(articleDto.getContent())
-        .ifPresent(findArticle::setContent);
-      Optional.ofNullable(articleDto.getImage())
-        .ifPresent((image) -> {
-          String findArticleImage = findArticle.getImage();
-          if (findArticleImage != null) {
-            try {
-              removeImage(findArticleImage);
-            } catch (RuntimeException e) {
-              throw new RuntimeException(e.getMessage());
-            }
-          }
-          findArticle.setImage(image);
-        });
+    }
 
-      return articleRepository.save(findArticle);
+    public Long deleteArticle(Long id) throws RuntimeException {
+        try {
+            Article article = getArticle(id);
+            removeImage(article.getImage());
+            articleRepository.delete(article);
+            return article.getCategory().getId();
+        } catch (EntityNotFoundException | BucketFileNotDeletedException e) {
+            throw new RuntimeException(e.getMessage());
+        }
     }
-    catch (EntityNotFoundException | BucketFileNotDeletedException e) {
-      throw new RuntimeException(e.getMessage());
-    }
-  }
 
-  public Long deleteArticle(Long id) throws RuntimeException {
-    try {
-      Article article = getArticle(id);
-      removeImage(article.getImage());
-      articleRepository.delete(article);
-      return article.getCategory().getId();
-    } catch (EntityNotFoundException | BucketFileNotDeletedException e) {
-      throw new RuntimeException(e.getMessage());
+    public void removeImage(String image) throws BucketFileNotDeletedException {
+        try {
+            s3BucketService.deleteFile(image);
+        } catch (Exception e) {
+            throw new BucketFileNotDeletedException("S3 버킷에서 이미지가 삭제되지 않았습니다.");
+        }
     }
-  }
-
-  public void removeImage(String image) throws BucketFileNotDeletedException {
-    try {
-      s3BucketService.deleteFile(image);
-    } catch (Exception e) {
-      throw new BucketFileNotDeletedException("S3 버킷에서 이미지가 삭제되지 않았습니다.");
-    }
-  }
 }

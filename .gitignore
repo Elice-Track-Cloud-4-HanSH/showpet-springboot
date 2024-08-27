@@ -37,3 +37,5 @@ out/
 .vscode/
 
 s3bucket.yaml
+
+*.log

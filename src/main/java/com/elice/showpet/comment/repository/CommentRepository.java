@@ -17,4 +17,5 @@ public interface CommentRepository {
 
     void deleteComment(Comment comment);
 
+    void deleteAllComments(Long articleId);
 }

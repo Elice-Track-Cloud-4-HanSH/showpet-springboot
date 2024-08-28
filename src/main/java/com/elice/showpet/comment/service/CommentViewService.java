@@ -55,4 +55,10 @@ public class CommentViewService {
                 .orElseThrow(() -> new CommentNotFoundException("not found comment: " + commentId));
         commentRepository.deleteComment(comment);
     }
+
+    // 게시글 삭제 시 댓글 전체 삭제
+    @Transactional
+    public void deleteAllComments(Long articleId){
+        commentRepository.deleteAllComments(articleId);
+    }
 }

@@ -89,7 +89,8 @@ public class CategoryViewController {
     public String editCategory(@PathVariable("id") long id, UpdateCategoryRequest request, @RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) {
         try {
             if (Objects.requireNonNull(file.getContentType()).startsWith("image")) {
-                String imageUrl = s3BucketService.uploadFile(file);
+                String category = "";
+                String imageUrl = s3BucketService.uploadFile(file, category);
                 request.setImage(imageUrl);
             }
             Category editCategory = categoryService.update(id, request);

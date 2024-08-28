@@ -56,18 +56,20 @@
             class="form-control"
             id="title"
             name="title"
-            maxlength="30"
-            placeholder="게시글 제목 입력 (최대 30자)"
+            maxlength="200"
+            placeholder="게시글 제목 입력 (최대 200자)"
             required
           />
         </div>
         <div class="mb-3">
           <label for="content">내용</label>
           <textarea
-            class="form-control"
+            class="form-control h-25"
+            rows="15"
             id="content"
             name="content"
-            placeholder="내용 입력"
+            maxlength="10000"
+            placeholder="내용 입력 (최대 10000자)"
           ></textarea>
         </div>
 
@@ -82,18 +84,20 @@
                   onchange="showPreviewImage(this)"
           />
         </div>
-        <div class="mb-3">
-          <img id="preview" src="#" alt="미리보기 이미지" style="display: none; max-width: 100%; height: auto;">
-        </div>
-
         <button type="submit" class="btn btn-primary">업로드</button>
         <button
-          type="button"
-          class="btn btn-secondary"
-          onclick="window.history.back();"
+                type="button"
+                class="btn btn-secondary"
+                onclick="window.history.back();"
         >
           취소
         </button>
+
+        <div class="mb-3 pt-5">
+          <img id="preview" src="#" alt="미리보기 이미지" style="display: none; max-width: 100%; height: auto;">
+        </div>
+
+
 
         <input type="hidden" id="categoryId" name="categoryId" th:value="${categoryId}"/>
       </form>

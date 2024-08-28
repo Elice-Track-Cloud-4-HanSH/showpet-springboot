@@ -21,8 +21,6 @@ import java.util.Optional;
 
 @Service
 public class ArticleViewService {
-    private final ArticleMapper articleMapper;
-
     private final JdbcTemplateRepository articleRepository;
 
     private final S3BucketService s3BucketService;
@@ -33,12 +31,10 @@ public class ArticleViewService {
 
     @Autowired
     public ArticleViewService(
-            ArticleMapper articleMapper,
             ArticleJdbcTemplateRepository articleRepository,
             S3BucketService s3BucketService,
             CategoryService categoryService
     ) {
-        this.articleMapper = articleMapper;
         this.articleRepository = articleRepository;
         this.s3BucketService = s3BucketService;
         this.categoryService = categoryService;

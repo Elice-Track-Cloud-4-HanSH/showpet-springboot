@@ -6,13 +6,13 @@ import com.elice.showpet.article.dto.UpdateArticleDto;
 import com.elice.showpet.comment.service.CommentViewService;
 import com.elice.showpet.common.exception.BucketFileNotDeletedException;
 import com.elice.showpet.common.exception.EntityNotFoundException;
-import com.elice.showpet.article.mapper.ArticleMapper;
 import com.elice.showpet.article.repository.ArticleJdbcTemplateRepository;
 import com.elice.showpet.article.repository.JdbcTemplateRepository;
 import com.elice.showpet.aws.s3.service.S3BucketService;
 import com.elice.showpet.category.entity.Category;
 import com.elice.showpet.category.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -31,6 +31,9 @@ public class ArticleViewService {
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     private final CommentViewService commentViewService;
+
+    @Value("${spring.enabled.anon}")
+    private boolean isEnabledAnon;
 
     @Autowired
     public ArticleViewService(
@@ -69,7 +72,7 @@ public class ArticleViewService {
     }
 
     public Article createArticle(CreateArticleDto articleDto) {
-        if (articleDto.getAnonPassword() != null) {
+        if (articleDto.getAnonPassword() != null && isEnabledAnon) {
             articleDto.setAnonPassword(encryptPassword(articleDto.getAnonPassword()));
         }
         Article created = articleDto.toEntity();

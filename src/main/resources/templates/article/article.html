@@ -55,7 +55,7 @@
           >
             <div class="card-body position-relative">
               <p class="mb-2" th:text="${comment.content}" >댓글 내용</p>
-              <small class="text-secondary" th:text="${#temporals.format(comment.updatedAt, 'yyyy.MM.dd HH:mm:ss')}">2024-01-04T13:21:21</small>
+              <small class="text-secondary" th:text="${#temporals.format(comment.updatedAt, 'yyyy.MM.dd HH:mm:ss')} + ${comment.createdAt == comment.updatedAt ? '' : '(수정됨)'}">2024-01-04T13:21:21</small>
 
               <div
                 class="position-absolute end-0 top-50 translate-middle-y mb-3 me-3 btn-group bg-white bg-opacity-75"
@@ -96,11 +96,17 @@
           <div class="input-group">
             <textarea
               class="form-control"
+              id="commentContent"
               name="content"
               cols="6"
               placeholder="댓글 작성하기"
+              maxlength="1000"
+              required
             ></textarea>
             <button class="btn btn-primary">업로드</button>
+          </div>
+          <div th:if="${errorMessage != null}">
+            <p th:text="'&#9757; ' + ${errorMessage} + ' &#128064;'" class="text-danger"></p>
           </div>
         </form>
 
@@ -135,7 +141,7 @@
                 class="dropdown-item text-danger btn btn-danger d-flex align-items-center gap-2"
                 data-bs-toggle="modal"
                 data-bs-target="#deleteArticleModal"
-                th:onclick="|handleDeleteArticleButton(event, [[${article.id}]], [[${categoryId}]]);|"
+                th:onclick="handleDeleteArticleButton(event, [[${article.id}]], [[${categoryId}]]);"
               >
                 <span class="material-symbols-outlined"> delete </span>삭제
               </button>
@@ -194,6 +200,8 @@
       tabindex="-1"
       aria-labelledby="editCommentModalLabel"
       aria-hidden="true"
+      th:classappend="${updateErrorMessage} ? ' show' : ''"
+      th:style="${updateErrorMessage} ? 'display: block;' : ''"
     >
       <div class="modal-dialog">
         <div class="modal-content">
@@ -216,7 +224,15 @@
                 name="content"
                 id="commentContentTextarea"
                 placeholder="댓글 수정하기..."
+                maxlength="1000"
+                required
+                th:text="${commentContent}"
               ></textarea>
+
+              <!-- 오류 메세지 -->
+              <div th:if="${updateErrorMessage}" class="mt-2">
+                <p th:text="'&#9757; ' + ${updateErrorMessage} + ' &#128064;'" class="text-danger"></p>
+              </div>
             </div>
             <div class="modal-footer">
               <button
@@ -282,6 +298,121 @@
       integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
       crossorigin="anonymous"
     ></script>
-    <script type="text/javascript" src="/js/article/article.js"></script>
+    <script th:inline="javascript">
+      let currentComment; // 삭제할 때 쓰는 commentId
+      let elementToDelete; // 삭제할 댓글 박스
+
+      function handleDeleteArticleButton(_, postId, boardId) {
+        currentArticle = postId;
+        currentBoard = boardId;
+      }
+
+      function handleDeleteArticleModalButton() {
+        currentBoard = 1;
+        fetch(`/articles/${currentArticle}`, {
+          method: "DELETE",
+        }).then(() => (window.location.href = `/category/${currentBoard}`));
+      }
+
+      // 댓글 삭제 버튼 클릭
+      function handleDeleteCommentButton(e, commentId) {
+        currentComment = commentId;
+        elementToDelete = e.target.closest(".card");
+      }
+
+      function checkArticlePasswordIsCorrect(articleId) {
+        const password = document.getElementById("delete-password");
+        const delBtn = document.getElementById("delete-post");
+        fetch(`/api/articles/validate-password`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json" // 요청 본문의 형식 지정
+          },
+          body: JSON.stringify({
+            "password": password.value,
+            "articleId": articleId
+          })
+        }).then((res) => {
+          if (res.status === 200) {
+            delBtn.disabled = false;
+            delBtn.classList.remove("disabled");
+          } else {
+            throw new Error("올바르지 않은 비밀번호입니다. 다시 입력해주세요.");
+          }
+        }).catch((err) => {
+          delBtn.disabled = true;
+          delBtn.classList.add("disabled");
+          alert(err.message);
+        })
+      }
+
+      // 실제 댓글 삭제(알림창)
+      function handleDeleteCommentModalButton() {
+        fetch(`/comments/${currentComment}`, {
+          method: "DELETE",
+        }).then(() => elementToDelete.remove());
+
+        const commentsCount = document.getElementById("commentsCount");
+        commentsCount.innerText = parseInt(commentsCount.innerText) - 1;
+
+        const modal = bootstrap.Modal.getInstance("#deleteCommentModal");
+        modal.hide();
+      }
+
+      let errorMessage = [[${errorMessage}]];
+      if(errorMessage) {
+        let commentContent = document.getElementById('commentContent');
+        commentContent.focus();
+      }
+
+      document.addEventListener("DOMContentLoaded", function() {
+        const editCommentModalElement = document.getElementById('editCommentModal');
+        const editCommentModal = new bootstrap.Modal(editCommentModalElement);
+
+        // 댓글 수정 버튼 클릭 시 호출되는 함수
+        window.handleEditCommentButton = function(content, commentId, articleId) {
+          // 댓글 내용 설정
+          document.getElementById("commentContentTextarea").value = content;
+          document.getElementById("commentEditForm")
+                  .setAttribute("action", `/comments/edit/${commentId}?articleId=${articleId}`);
+
+          // 검증 오류 메시지 제거
+          const updateErrorMessage = document.querySelector("#editCommentModal .text-danger");
+          if (updateErrorMessage) {
+            updateErrorMessage.innerText = "";
+          }
+
+          // 모달창 열기
+          editCommentModal.show();
+          document.getElementById('commentContentTextarea').focus();
+        };
+
+        // 모달 닫기 처리
+        editCommentModalElement.addEventListener('hide.bs.modal', function () {
+          // 모달 닫기 전 초기화
+          document.getElementById("commentContentTextarea").value = "";
+          const updateErrorMessage = document.querySelector("#editCommentModal .text-danger");
+          if (updateErrorMessage) {
+            updateErrorMessage.innerText = "";
+          }
+        });
+
+        // 모달이 완전히 닫힌 후 호출되는 이벤트
+        editCommentModalElement.addEventListener('hidden.bs.modal', function () {
+          // 마지막으로 클릭한 댓글 수정 버튼으로 포커스 이동
+          const lastFocusedButton = document.querySelector('.btn-outline-primary[data-bs-target="#editCommentModal"]');
+          if (lastFocusedButton) {
+            lastFocusedButton.focus();
+          }
+        });
+
+        // 검증 실패 시 모달 자동 표시 및 포커스
+        let updateErrorMessage = [[${updateErrorMessage}]];
+        if (updateErrorMessage) {
+          editCommentModal.show();
+          document.getElementById('commentContentTextarea').focus();
+        }
+      });
+    </script>
   </body>
 </html>

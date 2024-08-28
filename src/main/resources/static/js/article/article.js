@@ -58,10 +58,3 @@ function checkArticlePasswordIsCorrect(articleId) {
         alert(err.message);
     })
 }
-
-function handleEditCommentButton(content, commentId, articleId) {
-    document.getElementById("commentContentTextarea").innerText = content;
-    document
-        .getElementById("commentEditForm")
-        .setAttribute("action", `/comments/edit/${commentId}?articleId=${articleId}`);
-}

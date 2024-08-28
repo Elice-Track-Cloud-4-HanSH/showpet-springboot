@@ -86,4 +86,10 @@ public class CommentRepositoryImpl implements CommentRepository {
         jdbcTemplate.update(sql, comment.getId());
     }
 
+    @Override
+    public void deleteAllComments(Long articleId) {
+        String sql = "DELETE FROM comment WHERE article_id = ?";
+        jdbcTemplate.update(sql, articleId);
+    }
+
 }

@@ -52,6 +52,7 @@ public class ArticleViewController {
         try {
             Article article = articleViewService.getArticle(id);
             model.addAttribute("article", article);
+            model.addAttribute("categoryId", article.getCategory().getId());
 
             // 댓글 리스트 조회
             List<Comment> comments = commentViewService.getAllComments(id);

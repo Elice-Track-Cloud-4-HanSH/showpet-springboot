@@ -135,7 +135,7 @@
                 class="dropdown-item text-danger btn btn-danger d-flex align-items-center gap-2"
                 data-bs-toggle="modal"
                 data-bs-target="#deleteArticleModal"
-                th:onclick="handleDeleteArticleButton(event, [[${article.id}]]);"
+                th:onclick="|handleDeleteArticleButton(event, [[${article.id}]], [[${categoryId}]]);|"
               >
                 <span class="material-symbols-outlined"> delete </span>삭제
               </button>

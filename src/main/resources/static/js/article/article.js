@@ -1,22 +1,17 @@
 let currentArticle;
-let currentBoard;
+let currentCategory;
 let currentComment; // 삭제할 때 쓰는 commentId
 let elementToDelete; // 삭제할 댓글 박스
 
-function handleDeleteArticleButton(_, postId) {
-    currentArticle = postId;
-}
-
 function handleDeleteArticleButton(_, postId, boardId) {
     currentArticle = postId;
-    currentBoard = boardId;
+    currentCategory = boardId;
 }
 
 function handleDeleteArticleModalButton() {
-    currentBoard = 1;
     fetch(`/articles/${currentArticle}`, {
         method: "DELETE",
-    }).then(() => (window.location.href = `/boards/${currentBoard}`));
+    }).then(() => (window.location.href = `/category/${currentCategory}`));
 }
 
 // 댓글 삭제 버튼 클릭

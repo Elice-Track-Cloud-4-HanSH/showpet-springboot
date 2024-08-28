@@ -1,9 +1,11 @@
 package com.elice.showpet.article.controller;
 
 import com.elice.showpet.article.dto.CreateArticleDto;
+import com.elice.showpet.article.dto.DeleteArticleDto;
 import com.elice.showpet.article.dto.ResponseArticleDto;
 import com.elice.showpet.article.dto.UpdateArticleDto;
 import com.elice.showpet.article.service.ArticleRestService;
+import com.elice.showpet.article.service.ArticleViewService;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,10 +19,12 @@ import java.util.List;
 @RequestMapping("/api/articles")
 public class ArticleRestController {
     private ArticleRestService articleRestService;
+    private ArticleViewService articleViewService;
 
     @Autowired
-    public ArticleRestController(ArticleRestService articleRestService) {
+    public ArticleRestController(ArticleRestService articleRestService, ArticleViewService articleViewService) {
         this.articleRestService = articleRestService;
+        this.articleViewService = articleViewService;
     }
 
     @GetMapping
@@ -66,5 +70,13 @@ public class ArticleRestController {
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @PostMapping("/validate-password")
+    public ResponseEntity<?> validatePassword(@RequestBody DeleteArticleDto deleteArticleDto) {
+        System.out.println(deleteArticleDto);
+        boolean valid = articleViewService.verifyPassword(deleteArticleDto.getArticleId(), deleteArticleDto.getPassword());
+        if (valid) return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 }

@@ -40,6 +40,7 @@ public class ArticleJdbcTemplateRepository implements JdbcTemplateRepository {
                 .image(rs.getString("image"))
                 .createdAt(rs.getObject("created_at", LocalDateTime.class))
                 .updatedAt(rs.getObject("updated_at", LocalDateTime.class))
+                .anonPassword(rs.getString("anon_password"))
 //            .member(rs.getObject("member", Member.class))
                 .category(category)
                 .build();
@@ -66,8 +67,9 @@ public class ArticleJdbcTemplateRepository implements JdbcTemplateRepository {
     @Override
     public Article save(Article article) {
         if (article.getId() == null) {
-            String insertSql = "INSERT INTO article(title, content, image, created_at, updated_at, category_id) VALUES (?, ?, ?, ?, ?, ?)";
+            String insertSql = "INSERT INTO article(title, content, image, created_at, updated_at, category_id, ANON_PASSWORD) VALUES (?, ?, ?, ?, ?, ?, ?)";
             KeyHolder keyHolder = new GeneratedKeyHolder();
+            System.out.println(article.getAnonPassword());
 
             jdbcTemplate.update(
                     conn -> {
@@ -79,6 +81,7 @@ public class ArticleJdbcTemplateRepository implements JdbcTemplateRepository {
                         ps.setObject(4, now);
                         ps.setObject(5, now);
                         ps.setLong(6, article.getCategory().getId());
+                        ps.setString(7, article.getAnonPassword());
                         return ps;
                     }, keyHolder
             );

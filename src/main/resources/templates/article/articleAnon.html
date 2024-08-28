@@ -95,13 +95,13 @@
         >
           <div class="input-group">
             <textarea
-              class="form-control"
-              id="commentContent"
-              name="content"
-              cols="6"
-              placeholder="댓글 작성하기"
-              maxlength="1000"
-              required
+                    class="form-control"
+                    id="commentContent"
+                    name="content"
+                    cols="6"
+                    placeholder="댓글 작성하기"
+                    maxlength="1000"
+                    required
             ></textarea>
             <button class="btn btn-primary">업로드</button>
           </div>
@@ -141,7 +141,7 @@
                 class="dropdown-item text-danger btn btn-danger d-flex align-items-center gap-2"
                 data-bs-toggle="modal"
                 data-bs-target="#deleteArticleModal"
-                th:onclick="handleDeleteArticleButton(event, [[${article.id}]], [[${categoryId}]]);"
+                th:onclick="|handleDeleteArticleButton(event, [[${article.id}]], [[${categoryId}]]);|"
               >
                 <span class="material-symbols-outlined"> delete </span>삭제
               </button>
@@ -172,7 +172,11 @@
             ></button>
           </div>
           <div class="modal-body">
-            <p class="fw-light">게시글과 댓글이 삭제됩니다.</p>
+            <label for="delete-password" class="form-label">게시글과 댓글이 삭제됩니다. 비밀번호를 입력해주세요.</label>
+            <div class="input-group">
+              <input id="delete-password" type="text" class="form-control" placeholder="작성 글의 비밀번호를 입력해주세요." aria-label="Recipient's username" aria-describedby="button-addon2">
+              <button class="btn btn-outline-secondary" type="button" id="button-addon2" th:onclick="checkArticlePasswordIsCorrect([[${article.id}]])">제출</button>
+            </div>
           </div>
           <div class="modal-footer">
             <button
@@ -184,8 +188,10 @@
             </button>
             <button
               type="button"
+              id="delete-post"
               class="btn btn-danger"
               onclick="handleDeleteArticleModalButton()"
+              disabled
             >
               삭제
             </button>
@@ -220,13 +226,13 @@
                 method="POST">
             <div class="modal-body">
               <textarea
-                class="form-control"
-                name="content"
-                id="commentContentTextarea"
-                placeholder="댓글 수정하기..."
-                maxlength="1000"
-                required
-                th:text="${commentContent}"
+                      class="form-control"
+                      name="content"
+                      id="commentContentTextarea"
+                      placeholder="댓글 수정하기..."
+                      maxlength="1000"
+                      required
+                      th:text="${commentContent}"
               ></textarea>
 
               <!-- 오류 메세지 -->
@@ -369,27 +375,27 @@
         const editCommentModalElement = document.getElementById('editCommentModal');
         const editCommentModal = new bootstrap.Modal(editCommentModalElement);
 
-        // 댓글 수정 버튼 클릭 시 호출되는 함수
+// 댓글 수정 버튼 클릭 시 호출되는 함수
         window.handleEditCommentButton = function(content, commentId, articleId) {
-          // 댓글 내용 설정
+// 댓글 내용 설정
           document.getElementById("commentContentTextarea").value = content;
           document.getElementById("commentEditForm")
                   .setAttribute("action", `/comments/edit/${commentId}?articleId=${articleId}`);
 
-          // 검증 오류 메시지 제거
+// 검증 오류 메시지 제거
           const updateErrorMessage = document.querySelector("#editCommentModal .text-danger");
           if (updateErrorMessage) {
             updateErrorMessage.innerText = "";
           }
 
-          // 모달창 열기
+// 모달창 열기
           editCommentModal.show();
           document.getElementById('commentContentTextarea').focus();
         };
 
-        // 모달 닫기 처리
+// 모달 닫기 처리
         editCommentModalElement.addEventListener('hide.bs.modal', function () {
-          // 모달 닫기 전 초기화
+// 모달 닫기 전 초기화
           document.getElementById("commentContentTextarea").value = "";
           const updateErrorMessage = document.querySelector("#editCommentModal .text-danger");
           if (updateErrorMessage) {
@@ -397,16 +403,17 @@
           }
         });
 
-        // 모달이 완전히 닫힌 후 호출되는 이벤트
+// 모달이 완전히 닫힌 후 호출되는 이벤트
         editCommentModalElement.addEventListener('hidden.bs.modal', function () {
-          // 마지막으로 클릭한 댓글 수정 버튼으로 포커스 이동
-          const lastFocusedButton = document.querySelector('.btn-outline-primary[data-bs-target="#editCommentModal"]');
+// 마지막으로 클릭한 댓글 수정 버튼으로 포커스 이동
+          const lastFocusedButton =
+                  document.querySelector('.btn-outline-primary[data-bs-target="#editCommentModal"]');
           if (lastFocusedButton) {
             lastFocusedButton.focus();
           }
         });
 
-        // 검증 실패 시 모달 자동 표시 및 포커스
+// 검증 실패 시 모달 자동 표시 및 포커스
         let updateErrorMessage = [[${updateErrorMessage}]];
         if (updateErrorMessage) {
           editCommentModal.show();

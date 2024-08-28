@@ -1,5 +1,6 @@
 package com.elice.showpet.article.dto;
 
+import com.elice.showpet.article.entity.Article;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -22,4 +23,15 @@ public class CreateArticleDto {
 
     @Min(value = 1, message = "카테고리 id는 필수값입니다.")
     private Long categoryId;
+
+    private String anonPassword;
+
+    public Article toEntity() {
+        Article article = new Article();
+        article.setTitle(title);
+        article.setContent(content);
+        article.setImage(image);
+        article.setAnonPassword(anonPassword);
+        return article;
+    }
 }

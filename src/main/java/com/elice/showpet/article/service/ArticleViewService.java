@@ -3,6 +3,7 @@ package com.elice.showpet.article.service;
 import com.elice.showpet.article.entity.Article;
 import com.elice.showpet.article.dto.CreateArticleDto;
 import com.elice.showpet.article.dto.UpdateArticleDto;
+import com.elice.showpet.comment.service.CommentViewService;
 import com.elice.showpet.common.exception.BucketFileNotDeletedException;
 import com.elice.showpet.common.exception.EntityNotFoundException;
 import com.elice.showpet.article.mapper.ArticleMapper;
@@ -29,15 +30,19 @@ public class ArticleViewService {
 
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
+    private final CommentViewService commentViewService;
+
     @Autowired
     public ArticleViewService(
             ArticleJdbcTemplateRepository articleRepository,
             S3BucketService s3BucketService,
-            CategoryService categoryService
+            CategoryService categoryService,
+            CommentViewService commentViewService
     ) {
         this.articleRepository = articleRepository;
         this.s3BucketService = s3BucketService;
         this.categoryService = categoryService;
+        this.commentViewService = commentViewService;
     }
 
     public boolean verifyPassword(Long articleId, String password) {
@@ -111,6 +116,7 @@ public class ArticleViewService {
         try {
             Article article = getArticle(id);
             removeImage(article.getImage());
+            commentViewService.deleteAllComments(id);
             articleRepository.delete(article);
             return article.getCategory().getId();
         } catch (EntityNotFoundException | BucketFileNotDeletedException e) {

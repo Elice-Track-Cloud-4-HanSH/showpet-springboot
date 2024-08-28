@@ -7,8 +7,12 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Entity
@@ -18,7 +22,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @ToString
-public class MemberEntity {
+public class MemberEntity implements UserDetails {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
@@ -51,4 +55,19 @@ public class MemberEntity {
   )
   @ToString.Exclude
   private List<Comment> comments = new ArrayList<>();
+
+  @Override
+  public Collection<? extends GrantedAuthority> getAuthorities() {
+    return List.of(new SimpleGrantedAuthority("user"));
+  }
+
+  @Override
+  public String getPassword() {
+    return loginPw;
+  }
+
+  @Override
+  public String getUsername() {
+    return loginId;
+  }
 }

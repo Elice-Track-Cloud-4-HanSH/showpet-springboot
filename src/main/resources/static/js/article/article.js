@@ -38,6 +38,32 @@ function handleDeleteCommentModalButton() {
     modal.hide();
 }
 
+function checkArticlePasswordIsCorrect(articleId) {
+    const password = document.getElementById("delete-password");
+    const delBtn = document.getElementById("delete-post");
+    fetch(`/api/articles/validate-password`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json" // 요청 본문의 형식 지정
+        },
+        body: JSON.stringify({
+            "password": password.value,
+            "articleId": articleId
+        })
+    }).then((res) => {
+        if (res.status === 200) {
+            delBtn.disabled = false;
+            delBtn.classList.remove("disabled");
+        } else {
+            throw new Error("올바르지 않은 비밀번호입니다. 다시 입력해주세요.");
+        }
+    }).catch((err) => {
+        delBtn.disabled = true;
+        delBtn.classList.add("disabled");
+        alert(err.message);
+    })
+}
+
 function handleEditCommentButton(content, commentId, articleId) {
     document.getElementById("commentContentTextarea").innerText = content;
     document

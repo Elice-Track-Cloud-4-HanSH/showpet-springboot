@@ -68,10 +68,10 @@ public class ArticleViewService {
     }
 
     public Article createArticle(CreateArticleDto articleDto) {
-        if (articleDto.getPassword() != null) {
-            articleDto.setPassword(encryptPassword(articleDto.getPassword()));
+        if (articleDto.getAnonPassword() != null) {
+            articleDto.setAnonPassword(encryptPassword(articleDto.getAnonPassword()));
         }
-        Article created = articleMapper.toEntity(articleDto);
+        Article created = articleDto.toEntity();
         Category category = categoryService.findById(articleDto.getCategoryId());
         created.setCategory(category);
         return articleRepository.save(created);

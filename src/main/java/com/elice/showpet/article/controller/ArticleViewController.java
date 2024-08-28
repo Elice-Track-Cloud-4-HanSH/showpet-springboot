@@ -57,7 +57,7 @@ public class ArticleViewController {
             List<Comment> comments = commentViewService.getAllComments(id);
             model.addAttribute("comments", comments);
 
-            return "article/article";
+            return "article/articleAnon";
         } catch (Exception e) {
             return "redirect:/category";
         }
@@ -70,7 +70,7 @@ public class ArticleViewController {
     ) {
         categoryId = Objects.isNull(categoryId) ? 1 : categoryId;
         model.addAttribute("categoryId", categoryId);
-        return "article/createArticle";
+        return "article/createArticleAnon";
     }
 
     @PostMapping("/add")
@@ -104,7 +104,7 @@ public class ArticleViewController {
         try {
             Article article = articleViewService.getArticle(id);
             model.addAttribute("article", article);
-            return "article/editArticle";
+            return "article/editArticleAnon";
         } catch (Exception e) {
             return "redirect:/category";
         }
@@ -123,7 +123,7 @@ public class ArticleViewController {
             return "redirect:/articles/edit/{id}";
         }
         if (!articleViewService.verifyPassword(id, articleDto.getPassword())) {
-            return "error";
+            return "redirect:/articles/{id}";
         }
         try {
             if (Objects.requireNonNull(file.getContentType()).startsWith("image")) {

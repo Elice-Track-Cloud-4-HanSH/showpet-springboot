@@ -31,3 +31,6 @@ spring:
   config:
     import:
       - s3bucket.yaml
+
+  enabled:
+    anon: true

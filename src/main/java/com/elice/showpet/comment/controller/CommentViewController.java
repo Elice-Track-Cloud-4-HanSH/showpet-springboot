@@ -4,6 +4,7 @@ import com.elice.showpet.article.entity.Article;
 import com.elice.showpet.article.service.ArticleViewService;
 import com.elice.showpet.comment.dto.CommentRequestDto;
 import com.elice.showpet.comment.dto.CommentResponseDto;
+import com.elice.showpet.comment.entity.Comment;
 import com.elice.showpet.comment.exception.CommentNotFoundException;
 import com.elice.showpet.comment.service.CommentViewService;
 import jakarta.validation.Valid;
@@ -90,7 +91,7 @@ public class CommentViewController {
         Article article = articleViewService.getArticle(articleId);
         model.addAttribute("article", article);
 
-        List<CommentResponseDto> comments = commentViewService.getAllComments(articleId);
+        List<Comment> comments = commentViewService.getAllComments(articleId);
         model.addAttribute("comments", comments);
     }
 

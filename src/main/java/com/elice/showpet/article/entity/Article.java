@@ -15,7 +15,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
+@ToString(exclude = {"comments","member","category"})
 public class Article extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,13 +30,15 @@ public class Article extends BaseTimeEntity {
     @Column(length = 1000)
     private String image;
 
+    @Column(length = 1000)
+    private String anonPassword;
+
     @ManyToOne
     @JoinColumn(name = "member_id")
     private MemberEntity member;
 
     @ManyToOne
     @JoinColumn(name = "categoryId", nullable = false)
-    @ToString.Exclude
     private Category category;
 
     @OneToMany(
@@ -44,7 +46,6 @@ public class Article extends BaseTimeEntity {
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
-    @ToString.Exclude
     private List<Comment> comments = new ArrayList<>();
 
     public static ArticleBuilder builder() {

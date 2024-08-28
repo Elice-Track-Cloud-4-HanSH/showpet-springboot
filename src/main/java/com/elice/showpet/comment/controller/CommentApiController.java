@@ -1,10 +1,11 @@
 package com.elice.showpet.comment.controller;
 
+import com.elice.showpet.article.service.ArticleRestService;
 import com.elice.showpet.comment.dto.CommentRequestDto;
 import com.elice.showpet.comment.dto.CommentResponseDto;
 import com.elice.showpet.comment.exception.CommentNotFoundException;
 import com.elice.showpet.comment.service.CommentService;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,20 +13,31 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/api/comment")
 public class CommentApiController {
 
     private final CommentService commentService;
+    private final ArticleRestService articleService;
+
+    @Autowired
+    public CommentApiController(CommentService commentService, ArticleRestService articleService) {
+        this.commentService = commentService;
+        this.articleService = articleService;
+    }
 
     // 전체 댓글 조회
     @GetMapping("/articles/{articleId}")
     public ResponseEntity<List<CommentResponseDto>> getAllComments(@PathVariable("articleId") Long articleId) {
-        List<CommentResponseDto> comments = commentService.getAllComments(articleId);
-        if (comments.isEmpty()) { // 게시글 내에 댓글이 없는 경우
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT); // 204 No Content
+        try {
+            articleService.getArticle(articleId); // 존재하는 게시글인지 확인
+            List<CommentResponseDto> comments = commentService.getAllComments(articleId);
+            if (comments.isEmpty()) { // 게시글 내에 댓글이 없는 경우
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT); // 204 No Content
+            }
+            return new ResponseEntity<>(comments, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND); // 존재하지 않는 게시글
         }
-        return new ResponseEntity<>(comments, HttpStatus.OK);
     }
 
     // 댓글 조회
@@ -56,8 +68,8 @@ public class CommentApiController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT); // 204 No Content
     }
 
-    @ExceptionHandler({CommentNotFoundException.class, IllegalArgumentException.class})
-    private ResponseEntity<String> handleException(Exception e) {
+    @ExceptionHandler(CommentNotFoundException.class)
+    private ResponseEntity<String> handleCommentNotFound(CommentNotFoundException e) {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
     }
 

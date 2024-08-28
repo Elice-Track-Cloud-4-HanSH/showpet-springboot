@@ -7,7 +7,6 @@ import com.elice.showpet.article.service.ArticleViewService;
 import com.elice.showpet.aws.s3.service.S3BucketService;
 import com.elice.showpet.comment.entity.Comment;
 import com.elice.showpet.comment.service.CommentViewService;
-import jakarta.validation.constraints.Min;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

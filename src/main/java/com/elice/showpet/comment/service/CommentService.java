@@ -9,6 +9,7 @@ import com.elice.showpet.comment.exception.CommentNotFoundException;
 import com.elice.showpet.comment.mapper.CommentMapper;
 import com.elice.showpet.comment.repository.CommentRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

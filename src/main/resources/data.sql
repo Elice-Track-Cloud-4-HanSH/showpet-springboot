@@ -1,8 +1,9 @@
 INSERT INTO category(title, content) VALUES ('1234', 'qwer'), ('qwer', 'asdf');
 
-INSERT INTO article(title, content, category_id) VALUES ('1234', '2134', 1), ('1234', '2134', 1), ('1234', '2134', 2), ('1234', '2134', 1), ('1234', '2134', 2),
-                                                        ('1234', '2134', 1), ('1234', '2134', 1), ('1234', '2134', 2),
-                                                        ('1234', '2134', 1), ('1234', '2134', 2), ('1234', '2134', 1),
-                                                        ('1234', '2134', 2), ('1234', '2134', 1), ('1234', '2134', 1),
-                                                        ('1234', '2134', 2), ('1234', '2134', 1), ('1234', '2134', 1),
-                                                        ('1234', '2134', 2), ('1234', '2134', 1), ('1234', '2134', 1);
+INSERT INTO article(title, content, category_id, created_at, updated_at) VALUES ('1234', '2134', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP), ('1234', '2134', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP), ('1234', '2134', 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+                                                                                ('1234', '2134', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP), ('1234', '2134', 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP), ('1234', '2134', 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+                                                                                ('1234', '2134', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP), ('1234', '2134', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP), ('1234', '2134', 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+                                                                                ('1234', '2134', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP), ('1234', '2134', 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP), ('1234', '2134', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+                                                                                ('1234', '2134', 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP), ('1234', '2134', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP), ('1234', '2134', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+                                                                                ('1234', '2134', 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP), ('1234', '2134', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP), ('1234', '2134', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+                                                                                ('1234', '2134', 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP), ('1234', '2134', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP), ('1234', '2134', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);

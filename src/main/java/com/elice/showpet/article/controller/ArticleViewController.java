@@ -71,7 +71,7 @@ public class ArticleViewController {
 
     @GetMapping("/add")
     public String addArticleForm(
-            @RequestParam(value = "category-id", required = false) Long categoryId,
+            @RequestParam(value = "categoryId", required = false) Long categoryId,
             Model model
     ) {
         categoryId = Objects.isNull(categoryId) ? 1 : categoryId;

@@ -90,6 +90,7 @@
 
         <form
           class="mt-3 row"
+          id="commentForm"
           th:action="@{/comments(articleId=${article.id})}"
           method="POST"
         >
@@ -103,7 +104,7 @@
               maxlength="1000"
               required
             ></textarea>
-            <button class="btn btn-primary">업로드</button>
+            <button type="button" class="btn btn-primary" onclick="openPasswordModal()">업로드</button>
           </div>
           <div th:if="${errorMessage != null}">
             <p th:text="'&#9757; ' + ${errorMessage} + ' &#128064;'" class="text-danger"></p>
@@ -194,6 +195,53 @@
       </div>
     </div>
 
+    <!-- 댓글 비밀번호 입력 모달 -->
+    <div
+      class="modal fade"
+      id="passwordModal"
+      tabindex="-1"
+      aria-labelledby="passwordModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="passwordModalLabel">
+              비밀번호 입력
+            </h1>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <input
+              type="password"
+              class="form-control"
+              id="commentPassword"
+              placeholder="비밀번호를 입력하세요"
+              maxlength="10"
+              required
+            />
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              취소
+            </button>
+            <button type="button" class="btn btn-primary" id="submitPasswordButton">
+              확인
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div
       class="modal fade"
       id="editCommentModal"
@@ -233,6 +281,21 @@
               <div th:if="${updateErrorMessage}" class="mt-2">
                 <p th:text="'&#9757; ' + ${updateErrorMessage} + ' &#128064;'" class="text-danger"></p>
               </div>
+
+              <!-- 비밀번호 입력 -->
+              <input
+                type="password"
+                class="form-control mt-2"
+                id="updateCommentPassword"
+                name="password"
+                placeholder="비밀번호를 입력하세요"
+                maxlength="10"
+                required
+              />
+              <div th:if="${diffPasswordMessage}" class="mt-2">
+                <p th:text="${diffPasswordMessage}" class="text-danger"></p>
+              </div>
+
             </div>
             <div class="modal-footer">
               <button
@@ -271,6 +334,16 @@
           </div>
           <div class="modal-body">
             <p class="fw-light">해당 댓글이 삭제됩니다.</p>
+            <!-- 비밀번호 입력 -->
+            <input
+              type="password"
+              class="form-control mt-2"
+              id="deleteCommentPassword"
+              name="password"
+              placeholder="비밀번호를 입력하세요"
+              maxlength="10"
+              required
+            />
           </div>
           <div class="modal-footer">
             <button
@@ -299,6 +372,8 @@
       crossorigin="anonymous"
     ></script>
     <script th:inline="javascript">
+      let currentArticle;
+      let currentCategory;
       let currentComment; // 삭제할 때 쓰는 commentId
       let elementToDelete; // 삭제할 댓글 박스
 
@@ -308,11 +383,37 @@
       }
 
       function handleDeleteArticleModalButton() {
-        currentBoard = 1;
         fetch(`/articles/${currentArticle}`, {
           method: "DELETE",
-        }).then(() => (window.location.href = `/category/${currentBoard}`));
+        }).then(() => (window.location.href = `/category/${currentCategory}`));
       }
+
+      // 비밀번호 입력 모달
+      function openPasswordModal(){
+        const passwordModal = new bootstrap.Modal(document.getElementById('passwordModal'));
+        passwordModal.show();
+      }
+
+      document.getElementById('submitPasswordButton').addEventListener('click', function () {
+        // 비밀번호 입력값 가져오기
+        const passwordInput = document.getElementById('commentPassword');
+        const passwordValue = passwordInput.value.trim();
+
+        if (passwordValue) {
+          // 비밀번호를 폼에 추가
+          const commentForm = document.getElementById('commentForm');
+          const passwordField = document.createElement('input');
+          passwordField.type = 'hidden';
+          passwordField.name = 'password';
+          passwordField.value = passwordValue;
+          commentForm.appendChild(passwordField);
+
+          // 폼을 제출
+          commentForm.submit();
+        } else {
+          alert('비밀번호를 입력하세요.');
+        }
+      });
 
       // 댓글 삭제 버튼 클릭
       function handleDeleteCommentButton(e, commentId) {
@@ -348,15 +449,28 @@
 
       // 실제 댓글 삭제(알림창)
       function handleDeleteCommentModalButton() {
+        const password = document.getElementById("deleteCommentPassword").value;
+
         fetch(`/comments/${currentComment}`, {
           method: "DELETE",
-        }).then(() => elementToDelete.remove());
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({password: password})
+        }).then(response => {
+          if (response.status == 204) {
+            elementToDelete.remove();
+            const commentsCount = document.getElementById("commentsCount");
+            commentsCount.innerText = parseInt(commentsCount.innerText) - 1;
 
-        const commentsCount = document.getElementById("commentsCount");
-        commentsCount.innerText = parseInt(commentsCount.innerText) - 1;
-
-        const modal = bootstrap.Modal.getInstance("#deleteCommentModal");
-        modal.hide();
+            const modal = bootstrap.Modal.getInstance("#deleteCommentModal");
+            modal.hide();
+          } else if (response.status == 403) {
+            alert("비밀번호가 일치하지 않습니다.");
+          } else {
+            alert("댓글 삭제에 실패했습니다.");
+          }
+        });
       }
 
       let errorMessage = [[${errorMessage}]];
@@ -412,6 +526,18 @@
           editCommentModal.show();
           document.getElementById('commentContentTextarea').focus();
         }
+
+        let diffPasswordMessage = [[${diffPasswordMessage}]];
+        if(diffPasswordMessage) {
+          editCommentModal.show();
+          document.getElementById('commentContentTextarea').focus();
+        }
+
+        // 댓글 삭제 모달 초기화
+        const deleteCommentModal = document.getElementById('deleteCommentModal');
+        deleteCommentModal.addEventListener('hide.bs.modal', function(){
+          document.getElementById('deleteCommentPassword').value = '';
+        });
       });
     </script>
   </body>

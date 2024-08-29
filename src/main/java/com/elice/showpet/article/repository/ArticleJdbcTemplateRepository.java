@@ -65,9 +65,9 @@ public class ArticleJdbcTemplateRepository implements JdbcTemplateRepository {
     }
 
     @Override
-    public List<Article> search(int categoryId, String keyword) {
-        String sql = "SELECT * FROM article WHERE category_id = ? AND title LIKE ?";
-        return jdbcTemplate.query(sql, new Object[]{categoryId, "%" + keyword + "%"}, articleRowMapper);
+    public List<Article> search(int categoryId, String keyword, int page, int pageSize) {
+        String sql = "SELECT * FROM article WHERE category_id = ? AND title LIKE ? ORDER BY created_at DESC LIMIT ? OFFSET ?";
+        return jdbcTemplate.query(sql, new Object[]{categoryId, "%" + keyword + "%", pageSize, pageSize * page}, articleRowMapper);
     }
 
     @Override

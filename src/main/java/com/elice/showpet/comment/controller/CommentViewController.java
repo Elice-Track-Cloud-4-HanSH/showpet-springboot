@@ -91,7 +91,7 @@ public class CommentViewController {
         Article article = articleViewService.getArticle(articleId);
         model.addAttribute("article", article);
 
-        List<Comment> comments = commentViewService.getAllComments(articleId);
+        List<CommentResponseDto> comments = commentViewService.getAllComments(articleId);
         model.addAttribute("comments", comments);
     }
 

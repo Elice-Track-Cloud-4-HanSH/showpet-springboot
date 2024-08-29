@@ -32,6 +32,8 @@ public class ArticleViewService {
 
     private final CommentViewService commentViewService;
 
+    private final int pageSize = 20;
+
     @Value("${spring.enabled.anon}")
     private boolean isEnabledAnon;
 
@@ -66,8 +68,13 @@ public class ArticleViewService {
     public Article getArticle(Long id) throws EntityNotFoundException {
         return articleRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Article not found"));
     }
-
-    public List<Article> getPagenatedArticles(Integer categoryId, Integer page, Integer pageSize) {
+    /**
+     * pageSize는 20으로 할게요!
+     * @param categoryId
+     * @param page
+     * @return 특정 게시판의 pagenated 된 게시글 목록을 가져옵니다.
+     */
+    public List<Article> getPagenatedArticles(Integer categoryId, Integer page) {
         return articleRepository.findPagenated(categoryId, page, pageSize);
     }
 
@@ -113,6 +120,25 @@ public class ArticleViewService {
         } catch (EntityNotFoundException | BucketFileNotDeletedException e) {
             throw new RuntimeException(e.getMessage());
         }
+    }
+
+    public void deleteAllArticlesRelatedWithCategory(Integer categoryId) {
+        List<Article> articles = articleRepository.findPagenated(categoryId, 0, Integer.MAX_VALUE);
+        articles.forEach((article) -> {
+            deleteArticle(article.getId());
+        });
+    }
+
+    /**
+     * pageSize는 20으로 할게요!
+     * @param categoryId
+     * @param keyword
+     * @param page
+     * @return 해당 키워드를 가진 게시글 목록을 가져옵니다.
+     */
+    public List<Article> searchArticle(Integer categoryId, String keyword, int page) {
+        List<Article> articles = articleRepository.search(categoryId, keyword, page, pageSize);
+        return articles;
     }
 
     public Long deleteArticle(Long id) throws RuntimeException {

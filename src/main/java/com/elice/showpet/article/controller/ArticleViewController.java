@@ -6,7 +6,6 @@ import com.elice.showpet.article.entity.*;
 import com.elice.showpet.article.service.ArticleViewService;
 import com.elice.showpet.aws.s3.service.S3BucketService;
 import com.elice.showpet.comment.dto.CommentResponseDto;
-import com.elice.showpet.comment.entity.Comment;
 import com.elice.showpet.comment.service.CommentViewService;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -2,7 +2,6 @@ package com.elice.showpet.comment.service;
 
 import com.elice.showpet.article.entity.Article;
 import com.elice.showpet.article.repository.ArticleJdbcTemplateRepository;
-import com.elice.showpet.article.service.ArticleViewService;
 import com.elice.showpet.comment.dto.CommentRequestDto;
 import com.elice.showpet.comment.dto.CommentResponseDto;
 import com.elice.showpet.comment.entity.Comment;
@@ -34,6 +33,13 @@ public class CommentViewService {
         return comments.stream()
                 .map(commentMapper::commentToCommentResponseDto)
                 .collect(Collectors.toList());
+    }
+
+    // 댓글 조회
+    public CommentResponseDto getComment(Long commentId) {
+        Comment comment = commentRepository.getComment(commentId)
+                .orElseThrow(() -> new CommentNotFoundException("not found comment: " + commentId));
+        return commentMapper.commentToCommentResponseDto(comment);
     }
 
     // 댓글 생성
@@ -72,7 +78,7 @@ public class CommentViewService {
 
     // 게시글 삭제 시 댓글 전체 삭제
     @Transactional
-    public void deleteAllComments(Long articleId){
+    public void deleteAllComments(Long articleId) {
         commentRepository.deleteAllComments(articleId);
     }
 }

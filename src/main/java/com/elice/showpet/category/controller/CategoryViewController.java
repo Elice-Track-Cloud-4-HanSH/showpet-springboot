@@ -2,12 +2,13 @@ package com.elice.showpet.category.controller;
 
 
 import com.elice.showpet.article.entity.Article;
+import com.elice.showpet.article.service.ArticleViewService;
 import com.elice.showpet.aws.s3.service.S3BucketService;
-import com.elice.showpet.category.entity.Category;
 import com.elice.showpet.category.dto.AddCategoryRequest;
 import com.elice.showpet.category.dto.CategoryListViewResponse;
 import com.elice.showpet.category.dto.CategoryViewResponse;
 import com.elice.showpet.category.dto.UpdateCategoryRequest;
+import com.elice.showpet.category.entity.Category;
 import com.elice.showpet.category.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -25,39 +26,48 @@ import java.util.Objects;
 @RequestMapping("/category")
 public class CategoryViewController {
 
-    private final CategoryService categoryService;
-    private final S3BucketService s3BucketService;
+    private  final CategoryService categoryService;
+    private  final S3BucketService s3BucketService;
+    private  final ArticleViewService articleViewService;
 
-    @GetMapping()
+
+    @GetMapping() // 기본 카테고리 목록 화면
     public String getCategory(Model model) { // 카테고리 리스트 화면 띄우기
-        List<CategoryListViewResponse> category = categoryService.findAll()
-                .stream()
-                .map(CategoryListViewResponse::new)
-                .toList();
-        model.addAttribute("category", category);
+        try {
+            List<CategoryListViewResponse> category = categoryService.findAll()
+                    .stream()
+                    .map(CategoryListViewResponse::new)
+                    .toList();
+            model.addAttribute("category", category);
 
-        return "category/boardList";
+            return "category/boardList";
+        } catch (Exception e) {
+            return "error";
+        }
     }
 
     @GetMapping("/new") // 신규 카테고리 생성
     public String newCategory(@RequestParam(required = false, name = "id") Long id, Model model) {
-        if (id == null) { // id가 없으면 새롭게 블로그를 만든다.
-            model.addAttribute("category", new CategoryViewResponse());
-
-//        } else {
-//            Category category = categoryService.findById(id);
-//            model.addAttribute("category", new CategoryViewResponse(category));
-//            return "board/editBoard";
-//        }
+        try {
+            if (id == null) { // id가 없으면 새롭게 블로그를 만든다.
+                model.addAttribute("category", new CategoryViewResponse());
+            }
+            return "category/createBoard";
+        } catch (Exception e) {
+            return "error";
         }
-        return "category/createBoard";
     }
 
     @GetMapping("/edit/{id}") // 기존 카테고리 수정
     public String editCategory(@PathVariable("id") long id, Model model) {
+        try {
             Category category = categoryService.findById(id);
             model.addAttribute("category", new CategoryViewResponse(category));
             return "category/editBoard";
+        } catch (Exception e) {
+            return "error";
+        }
+
     }
 
     @PostMapping("/new") // 신규 카테고리 내용을 받기
@@ -75,11 +85,12 @@ public class CategoryViewController {
         }
     }
 
-    @PostMapping("/edit/{id}")
+    @PostMapping("/edit/{id}") // 카테고리 수정 시, 이미지 파일 수정
     public String editCategory(@PathVariable("id") long id, UpdateCategoryRequest request, @RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) {
         try {
             if (Objects.requireNonNull(file.getContentType()).startsWith("image")) {
-                String imageUrl = s3BucketService.uploadFile(file);
+                String category = "";
+                String imageUrl = s3BucketService.uploadFile(file, category);
                 request.setImage(imageUrl);
             }
             Category editCategory = categoryService.update(id, request);
@@ -90,16 +101,42 @@ public class CategoryViewController {
         }
     }
 
+//    @DeleteMapping("/delete/{id}")  딜리트매핑 원본 보관용 주석
+//    public String deleteCategory(@PathVariable("id") Long id) {
+//        try {
+//            categoryService.delete(id);
+//            return "redirect:/category";
+//        } catch (Exception e) {
+//            return "error";
+//        }
+//    }
+
     @DeleteMapping("/delete/{id}")
-    public String deleteCategory(@PathVariable("id") Long id) {
-        categoryService.delete(id);
-        return "redirect:/category";
+    public String deleteCategory(@PathVariable("id") long id) {
+        try {
+            categoryService.delete(id);
+            return "redirect:/category";
+        } catch (Exception e) {
+            return "error";
+        }
     }
 
-    //    @GetMapping("/category/{id}")
-//    public String getArticle(@PathVariable("id") long id, Model model) {
-//        Category category = categoryService.findById(id);
-//        model.addAttribute("article", new CategoryViewResponse(category));
-//        return "board/board";
-//    }
+    @GetMapping("/{id}")
+    public String getCategory(@PathVariable("id") long id,
+                              @RequestParam(value = "page", defaultValue = "0") int page, // 카테고리별 게시글 페이지 표시를 위한 데이터 받기
+                              @RequestParam(value = "size", defaultValue = "10") int size,
+                              Model model) {
+        try {
+            Category category = categoryService.findById(id);
+            List<Article> articles = articleViewService.getPagenatedArticles((int) id, page, size);
+            model.addAttribute("category", new CategoryViewResponse(category));
+            model.addAttribute("article", articles); // 게시판에 속하는 게시글, 페이지수를 표기하기 위해 데이터 추가
+            model.addAttribute("currentPage", page);
+            model.addAttribute("pageSize", size);
+
+            return "category/board";
+        } catch (Exception e) {
+            return "error";
+        }
+    }
 }

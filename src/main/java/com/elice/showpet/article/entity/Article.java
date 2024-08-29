@@ -6,7 +6,6 @@ import com.elice.showpet.common.entity.BaseTimeEntity;
 import com.elice.showpet.member.persistence.MemberEntity;
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,14 +14,14 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(exclude = {"comments","member","category"})
+@ToString
 public class Article extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 200)
-    private String title;
+  @Column(nullable = false, length = 200)
+  private String title;
 
     @Column(nullable = false, length = 10000)
     private String content;

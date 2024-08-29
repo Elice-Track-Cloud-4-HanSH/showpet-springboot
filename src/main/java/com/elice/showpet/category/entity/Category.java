@@ -39,11 +39,9 @@ public class Category {
   private List<Article> articles = new ArrayList<>();
 
   @ManyToOne
-  @JoinColumn(name = "memberId")
+  @JoinColumn(name = "userId")
   @ToString.Exclude
-
   private MemberEntity member;
-
 
   @Builder
   public Category(String title, String content) {

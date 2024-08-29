@@ -13,7 +13,7 @@ public interface JdbcTemplateRepository {
 
     Optional<Article> findById(Long id);
 
-    List<Article> search(int categoryId, String keyword);
+    List<Article> search(int categoryId, String keyword, int page, int pageSize);
 
     Article save(Article article);
 

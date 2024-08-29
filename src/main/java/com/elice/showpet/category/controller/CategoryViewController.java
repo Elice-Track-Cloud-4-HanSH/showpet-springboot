@@ -31,6 +31,7 @@ public class CategoryViewController {
     private  final ArticleViewService articleViewService;
 
 
+
     @GetMapping() // 기본 카테고리 목록 화면
     public String getCategory(Model model) { // 카테고리 리스트 화면 띄우기
         try {
@@ -58,6 +59,21 @@ public class CategoryViewController {
         }
     }
 
+    @PostMapping("/new") // 신규 카테고리 내용을 받기
+    public String addCategory(@ModelAttribute AddCategoryRequest request,
+                              @RequestParam("file") MultipartFile file) {
+        try {
+            if (Objects.requireNonNull(file.getContentType()).startsWith("image")) {
+                String imageUrl = s3BucketService.uploadFile(file);
+                request.setImage(imageUrl);
+            }
+            Category savedCategory = categoryService.save(request);
+            return "redirect:/category";
+        } catch (IOException e) {
+            return "redirect:/category/new";
+        }
+    }
+
     @GetMapping("/edit/{id}") // 기존 카테고리 수정
     public String editCategory(@PathVariable("id") long id, Model model) {
         try {
@@ -70,23 +86,11 @@ public class CategoryViewController {
 
     }
 
-    @PostMapping("/new") // 신규 카테고리 내용을 받기
-    public String addCategory(@ModelAttribute AddCategoryRequest request,
-                              @RequestParam("file") MultipartFile file) {
-        try {
-            if (Objects.requireNonNull(file.getContentType()).startsWith("image")) {
-                String imageUrl = s3BucketService.uploadFile(file);
-                request.setImage(imageUrl);
-            }
-            Category savedCategory = categoryService.save(request);
-             return "redirect:/category";
-        } catch (IOException e) {
-            return "redirect:/category/new";
-        }
-    }
 
     @PostMapping("/edit/{id}") // 카테고리 수정 시, 이미지 파일 수정
-    public String editCategory(@PathVariable("id") long id, UpdateCategoryRequest request, @RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) {
+    public String editCategory(@PathVariable("id") long id, UpdateCategoryRequest request,
+                               @RequestParam("file") MultipartFile file,
+                               RedirectAttributes redirectAttributes) {
         try {
             if (Objects.requireNonNull(file.getContentType()).startsWith("image")) {
                 String category = "";
@@ -101,20 +105,11 @@ public class CategoryViewController {
         }
     }
 
-//    @DeleteMapping("/delete/{id}")  딜리트매핑 원본 보관용 주석
-//    public String deleteCategory(@PathVariable("id") Long id) {
-//        try {
-//            categoryService.delete(id);
-//            return "redirect:/category";
-//        } catch (Exception e) {
-//            return "error";
-//        }
-//    }
-
     @DeleteMapping("/delete/{id}")
     public String deleteCategory(@PathVariable("id") long id) {
         try {
             categoryService.delete(id);
+            articleViewService.deleteAllArticlesRelatedWithCategory((int)id);
             return "redirect:/category";
         } catch (Exception e) {
             return "error";
@@ -138,4 +133,5 @@ public class CategoryViewController {
             return "error";
         }
     }
+
 }

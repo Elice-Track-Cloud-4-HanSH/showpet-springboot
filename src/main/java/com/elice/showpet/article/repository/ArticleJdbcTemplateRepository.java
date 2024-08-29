@@ -52,11 +52,11 @@ public class ArticleJdbcTemplateRepository implements JdbcTemplateRepository {
         return jdbcTemplate.query(sql, articleRowMapper);
     }
 
-  @Override
-  public List<Article> findPagenated(int categoryId, int page, int pageSize) {
-    String sql = "SELECT * FROM article WHERE category_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?"; // Order_By 추가 => 생성날짜별로 정렬
-    return jdbcTemplate.query(sql, articleRowMapper, categoryId, pageSize, pageSize * page);
-  }
+    @Override
+    public List<Article> findPagenated(int categoryId, int page, int pageSize) {
+        String sql = "SELECT * FROM article WHERE category_id = ? LIMIT ? OFFSET ?";
+        return jdbcTemplate.query(sql, articleRowMapper, categoryId, pageSize, pageSize * page);
+    }
 
     @Override
     public Optional<Article> findById(Long id) {

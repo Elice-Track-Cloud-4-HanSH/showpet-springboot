@@ -47,6 +47,7 @@ public class S3BucketService {
   }
 
   public void deleteFile(String fileName) throws BucketFileNotDeletedException {
+    if (fileName == null || fileName.isEmpty()) return;
     if (fileName.startsWith("https")) {
       fileName = fileName.substring(bucketUrl.length());
     }

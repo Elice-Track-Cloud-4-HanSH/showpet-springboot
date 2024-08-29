@@ -2,13 +2,14 @@ package com.elice.showpet.article.controller;
 
 import com.elice.showpet.article.dto.CreateArticleDto;
 import com.elice.showpet.article.dto.UpdateArticleDto;
-import com.elice.showpet.article.entity.Article;
+import com.elice.showpet.article.entity.*;
 import com.elice.showpet.article.service.ArticleViewService;
 import com.elice.showpet.aws.s3.service.S3BucketService;
-import com.elice.showpet.comment.dto.CommentResponseDto;
+import com.elice.showpet.comment.entity.Comment;
 import com.elice.showpet.comment.service.CommentViewService;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
@@ -28,6 +29,9 @@ public class ArticleViewController {
     private ArticleViewService articleViewService;
     private S3BucketService s3BucketService;
     private CommentViewService commentViewService;
+
+    @Value("${spring.enabled.anon}")
+    private boolean isEnabledAnon;
 
     @Autowired
     public ArticleViewController(
@@ -52,12 +56,13 @@ public class ArticleViewController {
         try {
             Article article = articleViewService.getArticle(id);
             model.addAttribute("article", article);
+            model.addAttribute("categoryId", article.getCategory().getId());
 
             // 댓글 리스트 조회
-            List<CommentResponseDto> comments = commentViewService.getAllComments(id);
+            List<Comment> comments = commentViewService.getAllComments(id);
             model.addAttribute("comments", comments);
 
-            return "article/article";
+            return isEnabledAnon ? "article/articleAnon" : "article/article";
         } catch (Exception e) {
             return "redirect:/category";
         }
@@ -70,7 +75,7 @@ public class ArticleViewController {
     ) {
         categoryId = Objects.isNull(categoryId) ? 1 : categoryId;
         model.addAttribute("categoryId", categoryId);
-        return "article/createArticle";
+        return isEnabledAnon ? "article/createArticleAnon" : "article/createArticle";
     }
 
     @PostMapping("/add")
@@ -104,7 +109,7 @@ public class ArticleViewController {
         try {
             Article article = articleViewService.getArticle(id);
             model.addAttribute("article", article);
-            return "article/editArticle";
+            return isEnabledAnon ? "article/editArticleAnon" : "article/editArticle";
         } catch (Exception e) {
             return "redirect:/category";
         }
@@ -122,6 +127,9 @@ public class ArticleViewController {
         if (error.hasErrors()) {
             return "redirect:/articles/edit/{id}";
         }
+        if (!articleViewService.verifyPassword(id, articleDto.getPassword()) && isEnabledAnon) {
+            return "redirect:/articles/{id}";
+        }
         try {
             if (Objects.requireNonNull(file.getContentType()).startsWith("image")) {
                 String imageUrl = s3BucketService.uploadFile(file);
@@ -129,24 +137,28 @@ public class ArticleViewController {
             }
             Article article = articleViewService.updateArticle(id, articleDto);
 
-      redirectAttributes.addAttribute("id", article.getId());
-      redirectAttributes.addFlashAttribute("message", "게시글이 수정되었습니다.");
-      return "redirect:/articles/{id}";
-    } catch (Exception e) {
-      return "redirect:/articles/edit/{id}";
+            redirectAttributes.addFlashAttribute("message", "게시글이 수정되었습니다.");
+            return "redirect:/articles/{id}";
+        } catch (Exception e) {
+            return "redirect:/articles/edit/{id}";
+        }
     }
-  }
 
-  @DeleteMapping("/{id}")
-  public String deleteArticle(
-    @PathVariable("id") Long id,
-    RedirectAttributes redirectAttributes
-  ) {
-    try {
-      articleViewService.deleteArticle(id);
-      return "redirect:/boards";
-    } catch (Exception e) {
-      return "error";
+    @DeleteMapping("/{id}")
+    public String deleteArticle(
+            @PathVariable("id") Long id,
+            RedirectAttributes redirectAttributes
+    ) {
+        if (id < 1) {
+            return "redirect:/category";
+        }
+        try {
+            Long categoryId = articleViewService.deleteArticle(id);
+            redirectAttributes.addAttribute("categoryId", categoryId);
+            return "redirect:/category/{categoryId}";
+        } catch (Exception e) {
+            redirectAttributes.addAttribute("id", id);
+            return "redirect:/articles/{id}";
+        }
     }
-  }
 }

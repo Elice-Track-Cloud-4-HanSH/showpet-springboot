@@ -124,15 +124,14 @@ public class CategoryViewController {
     @GetMapping("/{id}")
     public String getCategory(@PathVariable("id") long id,
                               @RequestParam(value = "page", defaultValue = "0") int page, // 카테고리별 게시글 페이지 표시를 위한 데이터 받기
-                              @RequestParam(value = "size", defaultValue = "10") int size,
                               Model model) {
         try {
             Category category = categoryService.findById(id);
-            List<Article> articles = articleViewService.getPagenatedArticles((int) id, page, size);
+            List<Article> articles = articleViewService.getPagenatedArticles((int) id, page);
             model.addAttribute("category", new CategoryViewResponse(category));
             model.addAttribute("article", articles); // 게시판에 속하는 게시글, 페이지수를 표기하기 위해 데이터 추가
             model.addAttribute("currentPage", page);
-            model.addAttribute("pageSize", size);
+            model.addAttribute("pageSize", 20);
 
             return "category/board";
         } catch (Exception e) {

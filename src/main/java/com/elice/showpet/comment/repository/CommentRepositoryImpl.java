@@ -22,7 +22,7 @@ public class CommentRepositoryImpl implements CommentRepository {
     private ArticleJdbcTemplateRepository articleRepository;
 
     @Autowired
-    public CommentRepositoryImpl(JdbcTemplate jdbcTemplate, ArticleJdbcTemplateRepository articleRepository){
+    public CommentRepositoryImpl(JdbcTemplate jdbcTemplate, ArticleJdbcTemplateRepository articleRepository) {
         this.jdbcTemplate = jdbcTemplate;
         this.articleRepository = articleRepository;
     }
@@ -35,6 +35,7 @@ public class CommentRepositoryImpl implements CommentRepository {
         return Comment.builder()
                 .id(rs.getLong("id"))
                 .content(rs.getString("content"))
+                .password(rs.getString("password"))
                 .createdAt(rs.getObject("created_at", LocalDateTime.class))
                 .updatedAt(rs.getObject("updated_at", LocalDateTime.class))
                 .article(article)
@@ -56,16 +57,17 @@ public class CommentRepositoryImpl implements CommentRepository {
     @Override
     public Comment upsertComment(Comment comment) {
         if (comment.getId() == null) {
-            String insertSql = "INSERT INTO comment (content, created_at, updated_at, article_id) VALUES (?, ?, ?, ?)";
+            String insertSql = "INSERT INTO comment (content, password, created_at, updated_at, article_id) VALUES (?, ?, ?, ?, ?)";
             KeyHolder keyHolder = new GeneratedKeyHolder();
 
             jdbcTemplate.update(
                     connection -> {
                         PreparedStatement ps = connection.prepareStatement(insertSql, new String[]{"id"});
                         ps.setString(1, comment.getContent());
-                        ps.setObject(2, LocalDateTime.now());
+                        ps.setString(2, comment.getPassword());
                         ps.setObject(3, LocalDateTime.now());
-                        ps.setObject(4, comment.getArticle().getId());
+                        ps.setObject(4, LocalDateTime.now());
+                        ps.setObject(5, comment.getArticle().getId());
                         return ps;
                     }, keyHolder);
 

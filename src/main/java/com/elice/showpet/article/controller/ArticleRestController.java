@@ -92,8 +92,8 @@ public class ArticleRestController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<ResponseArticleDto>> searchArticles(@RequestParam("key") String key, @RequestParam("category-id") Integer categoryId) {
-        List<ResponseArticleDto> responseArticleDto = articleViewService.searchArticle(categoryId, key).stream().map(mapper::toResponseDto).toList();
+    public ResponseEntity<List<ResponseArticleDto>> searchArticles(@RequestParam("key") String key, @RequestParam("category-id") Integer categoryId, @RequestParam("page") Integer page) {
+        List<ResponseArticleDto> responseArticleDto = articleViewService.searchArticle(categoryId, key, page).stream().map(mapper::toResponseDto).toList();
         return new ResponseEntity<>(responseArticleDto, HttpStatus.OK);
     }
 }

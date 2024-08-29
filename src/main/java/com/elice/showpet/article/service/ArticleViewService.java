@@ -91,9 +91,11 @@ public class ArticleViewService {
     public Article updateArticle(Long id, UpdateArticleDto articleDto) throws RuntimeException {
         try {
             Article findArticle = getArticle(id);
-            Optional.ofNullable(articleDto.getImageDeleted()).flatMap(_ -> Optional.ofNullable(findArticle.getImage())).ifPresent((str) -> {
+            Optional.ofNullable(articleDto.getImageDeleted()).ifPresent((val) -> {
+                if (val.isEmpty()) return;
+                if (findArticle.getImage() == null || findArticle.getImage().isEmpty()) return;
                 try {
-                    removeImage(str);
+                    removeImage(findArticle.getImage());
                 } catch (BucketFileNotDeletedException e) {
                     throw new BucketFileNotDeletedException(e.getMessage());
                 }

@@ -129,28 +129,24 @@ public class ArticleViewController {
             }
             Article article = articleViewService.updateArticle(id, articleDto);
 
-            redirectAttributes.addFlashAttribute("message", "게시글이 수정되었습니다.");
-            return "redirect:/articles/{id}";
-        } catch (Exception e) {
-            return "redirect:/articles/edit/{id}";
-        }
+      redirectAttributes.addAttribute("id", article.getId());
+      redirectAttributes.addFlashAttribute("message", "게시글이 수정되었습니다.");
+      return "redirect:/articles/{id}";
+    } catch (Exception e) {
+      return "redirect:/articles/edit/{id}";
     }
+  }
 
-    @DeleteMapping("/{id}")
-    public String deleteArticle(
-            @PathVariable("id") Long id,
-            RedirectAttributes redirectAttributes
-    ) {
-        if (id < 1) {
-            return "redirect:/category";
-        }
-        try {
-            Long categoryId = articleViewService.deleteArticle(id);
-            redirectAttributes.addAttribute("categoryId", categoryId);
-            return "redirect:/category/{categoryId}";
-        } catch (Exception e) {
-            redirectAttributes.addAttribute("id", id);
-            return "redirect:/articles/{id}";
-        }
+  @DeleteMapping("/{id}")
+  public String deleteArticle(
+    @PathVariable("id") Long id,
+    RedirectAttributes redirectAttributes
+  ) {
+    try {
+      articleViewService.deleteArticle(id);
+      return "redirect:/boards";
+    } catch (Exception e) {
+      return "error";
     }
+  }
 }

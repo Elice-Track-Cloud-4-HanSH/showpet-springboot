@@ -125,6 +125,7 @@
               cols="6"
               placeholder="댓글 작성하기"
               maxlength="1000"
+              required
             ></textarea>
             <button class="btn btn-primary">업로드</button>
           </div>
@@ -223,6 +224,8 @@
       tabindex="-1"
       aria-labelledby="editCommentModalLabel"
       aria-hidden="true"
+      th:classappend="${updateErrorMessage} ? ' show' : ''"
+      th:style="${updateErrorMessage} ? 'display: block;' : ''"
     >
       <div class="modal-dialog">
         <div class="modal-content">
@@ -247,7 +250,13 @@
                 placeholder="댓글 수정하기..."
                 maxlength="1000"
                 required
+                th:text="${commentContent}"
               ></textarea>
+
+              <!-- 오류 메세지 -->
+              <div th:if="${updateErrorMessage}" class="mt-2">
+                <p th:text="'&#9757; ' + ${updateErrorMessage} + ' &#128064;'" class="text-danger"></p>
+              </div>
             </div>
             <div class="modal-footer">
               <button
@@ -354,18 +363,60 @@
         modal.hide();
       }
 
-      function handleEditCommentButton(content, commentId, articleId) {
-        document.getElementById("commentContentTextarea").innerText = content;
-        document
-          .getElementById("commentEditForm")
-          .setAttribute("action", `/comments/edit/${commentId}?articleId=${articleId}`);
-      }
-
       let errorMessage = [[${errorMessage}]];
       if(errorMessage) {
         let commentContent = document.getElementById('commentContent');
         commentContent.focus();
       }
+
+      document.addEventListener("DOMContentLoaded", function() {
+        const editCommentModalElement = document.getElementById('editCommentModal');
+        const editCommentModal = new bootstrap.Modal(editCommentModalElement);
+
+        // 댓글 수정 버튼 클릭 시 호출되는 함수
+        window.handleEditCommentButton = function(content, commentId, articleId) {
+          // 댓글 내용 설정
+          document.getElementById("commentContentTextarea").value = content;
+          document.getElementById("commentEditForm")
+                  .setAttribute("action", `/comments/edit/${commentId}?articleId=${articleId}`);
+
+          // 검증 오류 메시지 제거
+          const updateErrorMessage = document.querySelector("#editCommentModal .text-danger");
+          if (updateErrorMessage) {
+            updateErrorMessage.innerText = "";
+          }
+
+          // 모달창 열기
+          editCommentModal.show();
+          document.getElementById('commentContentTextarea').focus();
+        };
+
+        // 모달 닫기 처리
+        editCommentModalElement.addEventListener('hide.bs.modal', function () {
+          // 모달 닫기 전 초기화
+          document.getElementById("commentContentTextarea").value = "";
+          const updateErrorMessage = document.querySelector("#editCommentModal .text-danger");
+          if (updateErrorMessage) {
+            updateErrorMessage.innerText = "";
+          }
+        });
+
+        // 모달이 완전히 닫힌 후 호출되는 이벤트
+        editCommentModalElement.addEventListener('hidden.bs.modal', function () {
+          // 마지막으로 클릭한 댓글 수정 버튼으로 포커스 이동
+          const lastFocusedButton = document.querySelector('.btn-outline-primary[data-bs-target="#editCommentModal"]');
+          if (lastFocusedButton) {
+            lastFocusedButton.focus();
+          }
+        });
+
+        // 검증 실패 시 모달 자동 표시 및 포커스
+        let updateErrorMessage = [[${updateErrorMessage}]];
+        if (updateErrorMessage) {
+          editCommentModal.show();
+          document.getElementById('commentContentTextarea').focus();
+        }
+      });
     </script>
   </body>
 </html>

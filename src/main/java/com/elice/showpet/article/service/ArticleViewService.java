@@ -115,6 +115,18 @@ public class ArticleViewService {
         }
     }
 
+    public void deleteAllArticlesRelatedWithCategory(Integer categoryId) {
+        List<Article> articles = articleRepository.findPagenated(categoryId, 0, Integer.MAX_VALUE);
+        articles.forEach((article) -> {
+            deleteArticle(article.getId());
+        });
+    }
+
+    public List<Article> searchArticle(Integer categoryId, String keyword) {
+        List<Article> articles = articleRepository.search(categoryId, keyword);
+        return articles;
+    }
+
     public Long deleteArticle(Long id) throws RuntimeException {
         try {
             Article article = getArticle(id);

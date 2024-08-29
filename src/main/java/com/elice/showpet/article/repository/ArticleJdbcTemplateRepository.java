@@ -48,13 +48,13 @@ public class ArticleJdbcTemplateRepository implements JdbcTemplateRepository {
 
     @Override
     public List<Article> findAll() {
-        String sql = "SELECT * FROM article";
+        String sql = "SELECT * FROM article ORDER BY created_at DESC";
         return jdbcTemplate.query(sql, articleRowMapper);
     }
 
     @Override
     public List<Article> findPagenated(int categoryId, int page, int pageSize) {
-        String sql = "SELECT * FROM article WHERE category_id = ? LIMIT ? OFFSET ?";
+        String sql = "SELECT * FROM article WHERE category_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?";
         return jdbcTemplate.query(sql, articleRowMapper, categoryId, pageSize, pageSize * page);
     }
 
@@ -65,11 +65,16 @@ public class ArticleJdbcTemplateRepository implements JdbcTemplateRepository {
     }
 
     @Override
+    public List<Article> search(int categoryId, String keyword) {
+        String sql = "SELECT * FROM article WHERE category_id = ? AND title LIKE ?";
+        return jdbcTemplate.query(sql, new Object[]{categoryId, "%" + keyword + "%"}, articleRowMapper);
+    }
+
+    @Override
     public Article save(Article article) {
         if (article.getId() == null) {
             String insertSql = "INSERT INTO article(title, content, image, created_at, updated_at, category_id, ANON_PASSWORD) VALUES (?, ?, ?, ?, ?, ?, ?)";
             KeyHolder keyHolder = new GeneratedKeyHolder();
-            System.out.println(article.getAnonPassword());
 
             jdbcTemplate.update(
                     conn -> {

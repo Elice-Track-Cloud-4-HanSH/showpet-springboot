@@ -13,6 +13,8 @@ public interface JdbcTemplateRepository {
 
     Optional<Article> findById(Long id);
 
+    List<Article> search(int categoryId, String keyword);
+
     Article save(Article article);
 
     void delete(Article article);

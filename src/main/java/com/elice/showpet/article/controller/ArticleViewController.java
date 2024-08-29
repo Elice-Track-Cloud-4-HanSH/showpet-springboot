@@ -5,7 +5,7 @@ import com.elice.showpet.article.dto.UpdateArticleDto;
 import com.elice.showpet.article.entity.*;
 import com.elice.showpet.article.service.ArticleViewService;
 import com.elice.showpet.aws.s3.service.S3BucketService;
-import com.elice.showpet.comment.entity.Comment;
+import com.elice.showpet.comment.dto.CommentResponseDto;
 import com.elice.showpet.comment.service.CommentViewService;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +59,7 @@ public class ArticleViewController {
             model.addAttribute("categoryId", article.getCategory().getId());
 
             // 댓글 리스트 조회
-            List<Comment> comments = commentViewService.getAllComments(id);
+            List<CommentResponseDto> comments = commentViewService.getAllComments(id);
             model.addAttribute("comments", comments);
 
             return isEnabledAnon ? "article/articleAnon" : "article/article";

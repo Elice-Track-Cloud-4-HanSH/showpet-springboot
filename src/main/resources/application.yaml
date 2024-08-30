@@ -20,14 +20,15 @@ spring:
     init:
       mode: always
 
-  datasource:
-    driver-class-name: org.h2.Driver
-    # https://kukim.tistory.com/105
-    url: jdbc:h2:mem:showpet
-    username: sa
-    password: ''
-
   servlet:
     multipart:
       max-file-size: 50MB
       max-request-size: 50MB
+
+  config:
+    import:
+      - s3bucket.yaml
+      - mysql.yaml
+
+  enabled:
+    anon: true

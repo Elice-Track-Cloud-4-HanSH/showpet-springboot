@@ -6,7 +6,6 @@ import com.elice.showpet.common.entity.BaseTimeEntity;
 import com.elice.showpet.member.persistence.MemberEntity;
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,8 +20,8 @@ public class Article extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 200)
-    private String title;
+  @Column(nullable = false, length = 200)
+  private String title;
 
     @Column(nullable = false, length = 10000)
     private String content;
@@ -30,13 +29,15 @@ public class Article extends BaseTimeEntity {
     @Column(length = 1000)
     private String image;
 
+    @Column(length = 1000)
+    private String anonPassword;
+
     @ManyToOne
     @JoinColumn(name = "member_id")
     private MemberEntity member;
 
     @ManyToOne
     @JoinColumn(name = "categoryId", nullable = false)
-    @ToString.Exclude
     private Category category;
 
     @OneToMany(
@@ -44,7 +45,6 @@ public class Article extends BaseTimeEntity {
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
-    @ToString.Exclude
     private List<Comment> comments = new ArrayList<>();
 
     public static ArticleBuilder builder() {

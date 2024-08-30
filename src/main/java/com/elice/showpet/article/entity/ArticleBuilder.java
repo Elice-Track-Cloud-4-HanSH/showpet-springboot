@@ -18,6 +18,7 @@ public class ArticleBuilder {
     private List<Comment> comments;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private String anonPassword;
 
     public ArticleBuilder id(Long id) {
         this.id = id;
@@ -64,6 +65,11 @@ public class ArticleBuilder {
         return this;
     }
 
+    public ArticleBuilder anonPassword(String anonPassword) {
+        this.anonPassword = anonPassword;
+        return this;
+    }
+
     public Article build() {
         Article article = new Article();
         article.setId(id);
@@ -75,6 +81,7 @@ public class ArticleBuilder {
         article.setComments(comments);
         article.setCreatedAt(createdAt);
         article.setUpdatedAt(updatedAt);
+        article.setAnonPassword(anonPassword);
         return article;
     }
 }

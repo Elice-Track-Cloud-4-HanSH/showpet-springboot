@@ -23,77 +23,58 @@
         font-family: "Elice DX Neolli", sans-serif;
       }
     </style>
-    <title th:text="${board.name}"></title>
+    <title th:text="${category.title}"></title>
   </head>
   <body>
     <div class="container my-5">
-      <a
-        class="link link-offset-1 link-offset-2-hover text-sm fs-6 mb-2 d-block"
-        style="transition: all 0.1s ease-in-out"
-        th:href="@{/boards}"
-        >&larr; 게시판 목록으로 돌아가기</a
-      >
+      <a class="link link-offset-1 link-offset-2-hover text-sm fs-6 mb-2 d-block" style="transition: all 0.1s ease-in-out" th:href="@{/category}">
+        &larr; 게시판 목록으로 돌아가기
+      </a>
       <div class="header mb-5">
-        <h1 class="text-center" th:text="${board.name}">게시판 제목</h1>
-        <p
-          class="text-center text-secondary"
-          th:text="${board.description}"
-        ></p>
+        <h1 class="text-center" th:text="${category.title}">게시판 제목</h1>
       </div>
       <div class="d-flex w-100 justify-content-between mb-3">
-        <form>
           <div class="input-group">
-            <input
-              class="form-control"
-              name="keyword"
-              placeholder="키워드 검색"
-              th:value="${keyword}"
-            />
-            <button class="btn btn-primary lh-1 p-0 px-2">
+            <form>
               <span class="material-symbols-outlined"> search </span>
-            </button>
+            <label>
+              <input type="text" class="form-control" placeholder="검색...">
+            </label>
+            </form>
           </div>
-        </form>
-        <a
-          th:href="@{/posts/create(boardId=${board.id})}"
-          class="btn btn-primary"
-          >게시글 추가</a
-        >
-      </div>
-      <div class="list-group position-relative mb-3">
-        <a
-          class="board-item list-group-item p-3 list-group-item-action"
-          th:unless="${postPage.isEmpty()}"
-          th:each="post : ${postPage}"
-          th:href="@{/posts/{postId}(postId=${post.id})}"
-        >
-          <h4 class="fw-bold mb-1" th:text="${post.title}">게시글 제목</h4>
-          <small class="text-secondary" th:text="${post.createdAt}"
-            >게시글 생성일</small
-          >
+        <a th:href="@{/articles/add(categoryId=${category.id})}" class="btn btn-primary">
+          게시글 추가
         </a>
-        <span
-          th:if="${postPage.isEmpty()}"
-          class="text-center"
-          th:text="${keyword != null ? '`' + keyword + '` 키워드에 해당하는 게시글이 없습니다.' : '올라온 게시글이 없습니다.'}"
-        ></span>
       </div>
-      <div class="w-100 d-flex justify-content-center">
-        <ul class="pagination">
-          <li
-            th:each="i : ${postPage.totalPages > 1 ? #numbers.sequence(0, postPage.totalPages - 1) : #numbers.sequence(0, 0)}"
-            class="page-item"
-            th:classappend="${i == postPage.number ? 'active' : ''}"
-          >
-            <a
-              class="page-link"
-              th:href="@{/boards/{boardId}(page=${i}, size=${postPage.size}, boardId=${board.id}, keyword=${keyword})}"
-              th:text="${i + 1}"
-              >0</a
-            >
+      <div class="list-group position-relative mb-3" th:each="articleList, loop : ${pageSize}">
+        <a class="board-item list-group-item p-3 list-group-item-action"
+           th:each="article : ${article}"
+          th:href="@{/articles/{articleId}(articleId=${article.id})}">
+          <h4 class="fw-bold mb-1" th:text="${article.title}">게시글 제목</h4>
+          <small class="text-secondary" th:text="${#temporals.format(article.createdAt, 'yyyy-MM-dd HH:mm')}">게시글 생성일</small>
+        </a>
+      </div>
+      <!--게시글이 없을 경우 메시지 표시-->
+      <div th:if="${article.isEmpty()}"
+           class="alert alert-info" role="alert">이 카테고리에는 아직 게시글이 없습니다.</div>
+
+      <!--페이지네이션-->
+      <nav aria-label="Page navigation" th:if="${!article.isEmpty()}">
+        <ul class="pagination justify-content-center">
+          <li class="page-item" th:classappend="${currentPage == 0} ? disabled">
+            <a class="page-link"
+               th:href="@{/category/{id}(id=${category.id}, page=${currentPage - 1}, size=${pageSize})}"
+               tabindex="-1">이전</a>
+          </li>
+          <li class="page-item">
+            <span class="page-link" th:text="${currentPage + 1}"></span>
+          </li>
+          <li class="page-item">
+            <a class="page-link"
+               th:href="@{/category/{id}(id=${category.id}, page=${currentPage + 1}, size=${pageSize})}">다음</a>
           </li>
         </ul>
-      </div>
+      </nav>
     </div>
 
     <!-- 부트스트랩 JS 추가 -->

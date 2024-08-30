@@ -1,124 +1,66 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
-      crossorigin="anonymous"
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+            crossorigin="anonymous"
     />
     <link
-      href="https://font.elice.io/css?family=Elice+DX+Neolli"
-      rel="stylesheet"
+            href="https://font.elice.io/css?family=Elice+DX+Neolli"
+            rel="stylesheet"
     />
-
-    <style>
-      html,
-      body {
-        font-family: "Elice DX Neolli", sans-serif;
-      }
-      .icon-container {
-        position: relative; /* 부모 컨테이너를 상대적으로 배치합니다. */
-        display: inline-block; /* 필요에 따라 크기 조정 */
-      }
-      .icon-container img {
-        display: block; /* 이미지의 기본 블록 레벨 디스플레이 */
-      }
-      .icon-container .overlay {
-        position: absolute; /* 자식 요소를 절대적으로 배치합니다. */
-        top: 50px;
-        right: 50%;
-        width: 32px; /* 부모 요소에 맞추어 크기 조정 */
-        height: 32px; /* 부모 요소에 맞추어 크기 조정 */
-        z-index: 10; /* 오버레이를 다른 이미지 위로 이동 */
-        background-color: white;
-        cursor: pointer;
-        pointer-events: auto;
-      }
-    </style>
+    <link rel="stylesheet" href="/css/article/updateArticle.css"/>
     <title>게시글 수정</title>
-    <script>
-
-      function showPreviewImage(input) {
-        const previewSection = document.getElementById("preview-section");
-        const preview = document.getElementById('preview')
-        const imgDeleteBtn = document.getElementById('img-delete-btn')
-        if (input.files && input.files[0]) {
-          previewSection.style.display = "block";
-          imgDeleteBtn.style.display = "block";
-          let reader = new FileReader();
-          reader.onload = (e) => {
-            preview.src = e.target.result;
-            preview.style.display = "block";
-            preview.style.maxWidth = "100%";
-            preview.style.maxHeight = "auto";
-          }
-          reader.readAsDataURL(input.files[0]);
-        } else {
-          preview.src = "#";
-          preview.style.display = "none";
-        }
-      }
-
-      function removeImage(input) {
-        const previewSection = document.getElementById("preview-section");
-        const deleteFlagText = document.getElementById("deleted");
-        const preview = document.getElementById('preview');
-        const fileSection = document.getElementById('fileInput');
-        fileSection.value = null;
-        deleteFlagText.value = "t";
-        preview.src = "#";
-        previewSection.style.display = "none";
-      }
-    </script>
-  </head>
-  <body>
-    <div class="container my-5">
-      <div class="header mb-5">
+</head>
+<body>
+<div class="container my-5">
+    <div class="header mb-5">
         <h1 class="text-center">게시글 수정</h1>
-      </div>
-      <form
-        th:action="@{/articles/edit/{articleId}(articleId=${article.id})}"
-        method="post"
-        enctype="multipart/form-data"
-      >
+    </div>
+    <form
+            th:action="@{/articles/edit/{articleId}(articleId=${article.id})}"
+            method="post"
+            enctype="multipart/form-data"
+    >
         <div class="mb-3">
-          <label for="title">게시글 제목</label>
-          <input
-            type="text"
-            class="form-control"
-            id="title"
-            name="title"
-            maxlength="200"
-            placeholder="게시글 제목 입력 (최대 200자)"
-            required
-            th:value="${article.title}"
-          />
+            <label for="title">게시글 제목</label>
+            <input
+                    type="text"
+                    class="form-control"
+                    id="title"
+                    name="title"
+                    maxlength="200"
+                    placeholder="게시글 제목 입력 (최대 200자)"
+                    required
+                    th:value="${article.title}"
+            />
         </div>
         <div class="mb-3">
-          <label for="content">내용</label>
-          <textarea
-            class="form-control h-25"
-            rows="15"
-            id="content"
-            name="content"
-            maxlength="10000"
-            placeholder="내용 입력 (최대 10000자)"
-            th:text="${article.content}"
-          ></textarea>
+            <label for="content">내용</label>
+            <textarea
+                    class="form-control h-25"
+                    rows="15"
+                    id="content"
+                    name="content"
+                    maxlength="10000"
+                    placeholder="내용 입력 (최대 10000자)"
+                    th:text="${article.content}"
+            ></textarea>
         </div>
 
         <div class="mb-3">
-          <label for="fileInput">이미지 업로드</label>
-          <input
-                  type="file"
-                  class="form-control"
-                  id="fileInput"
-                  name="file"
-                  accept="image/*"
-                  onchange="showPreviewImage(this)"
-          />
+            <label for="fileInput">이미지 업로드</label>
+            <input
+                    type="file"
+                    class="form-control"
+                    id="fileInput"
+                    name="file"
+                    accept="image/*"
+                    onchange="showPreviewImage(this)"
+            />
         </div>
 
         <input
@@ -129,42 +71,42 @@
 
         <button type="submit" class="btn btn-primary">수정</button>
         <button
-          type="button"
-          class="btn btn-secondary"
-          onclick="window.history.back();"
+                type="button"
+                class="btn btn-secondary"
+                onclick="window.history.back();"
         >
-          취소
+            취소
         </button>
-
 
         <div
                 class="mb-3 pt-5 icon-container"
                 id="preview-section"
                 th:style="${ article.image == null || article.image == '' ? 'display: none;' : 'display: block;' }"
         >
-          <img
-                  th:src="@{/image/x.svg}"
-                  class="overlay"
-                  title="이미지 삭제 버튼입니다!"
-                  id="img-delete-btn"
-                  onclick="removeImage(this)"
-          />
-          <img
-                  id="preview"
-                  width="50%"
-                  height="auto"
-                  th:src="${article.image}"
-                  alt="미리보기 이미지"
-          >
+            <img
+                    th:src="@{/image/x.svg}"
+                    class="overlay"
+                    title="이미지 삭제 버튼입니다!"
+                    id="img-delete-btn"
+                    onclick="removeImage(this)"
+            />
+            <img
+                    id="preview"
+                    width="50%"
+                    height="auto"
+                    th:src="${article.image}"
+                    alt="미리보기 이미지"
+            >
         </div>
-      </form>
-    </div>
+    </form>
+</div>
 
-    <!-- 부트스트랩 JS 추가 -->
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-      integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
-      crossorigin="anonymous"
-    ></script>
-  </body>
+<!-- 부트스트랩 JS 추가 -->
+<script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"
+></script>
+<script type="text/javascript" src="/js/article/editArticle.js"></script>
+</body>
 </html>

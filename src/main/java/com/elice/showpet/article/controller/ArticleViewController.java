@@ -5,11 +5,11 @@ import com.elice.showpet.article.dto.UpdateArticleDto;
 import com.elice.showpet.article.entity.*;
 import com.elice.showpet.article.service.ArticleViewService;
 import com.elice.showpet.aws.s3.service.S3BucketService;
-import com.elice.showpet.comment.entity.Comment;
+import com.elice.showpet.comment.dto.CommentResponseDto;
 import com.elice.showpet.comment.service.CommentViewService;
-import jakarta.validation.constraints.Min;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
@@ -29,6 +29,9 @@ public class ArticleViewController {
     private ArticleViewService articleViewService;
     private S3BucketService s3BucketService;
     private CommentViewService commentViewService;
+
+    @Value("${spring.enabled.anon}")
+    private boolean isEnabledAnon;
 
     @Autowired
     public ArticleViewController(
@@ -53,12 +56,13 @@ public class ArticleViewController {
         try {
             Article article = articleViewService.getArticle(id);
             model.addAttribute("article", article);
+            model.addAttribute("categoryId", article.getCategory().getId());
 
             // 댓글 리스트 조회
-            List<Comment> comments = commentViewService.getAllComments(id);
+            List<CommentResponseDto> comments = commentViewService.getAllComments(id);
             model.addAttribute("comments", comments);
 
-            return "article/article";
+            return isEnabledAnon ? "article/articleAnon" : "article/article";
         } catch (Exception e) {
             return "redirect:/category";
         }
@@ -66,12 +70,12 @@ public class ArticleViewController {
 
     @GetMapping("/add")
     public String addArticleForm(
-            @RequestParam(value = "category-id", required = false) Long categoryId,
+            @RequestParam(value = "categoryId", required = false) Long categoryId,
             Model model
     ) {
         categoryId = Objects.isNull(categoryId) ? 1 : categoryId;
         model.addAttribute("categoryId", categoryId);
-        return "article/createArticle";
+        return isEnabledAnon ? "article/createArticleAnon" : "article/createArticle";
     }
 
     @PostMapping("/add")
@@ -105,7 +109,7 @@ public class ArticleViewController {
         try {
             Article article = articleViewService.getArticle(id);
             model.addAttribute("article", article);
-            return "article/editArticle";
+            return isEnabledAnon ? "article/editArticleAnon" : "article/editArticle";
         } catch (Exception e) {
             return "redirect:/category";
         }
@@ -122,6 +126,9 @@ public class ArticleViewController {
         redirectAttributes.addAttribute("id", id);
         if (error.hasErrors()) {
             return "redirect:/articles/edit/{id}";
+        }
+        if (!articleViewService.verifyPassword(id, articleDto.getPassword()) && isEnabledAnon) {
+            return "redirect:/articles/{id}";
         }
         try {
             if (Objects.requireNonNull(file.getContentType()).startsWith("image")) {

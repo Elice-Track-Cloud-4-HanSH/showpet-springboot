@@ -96,13 +96,13 @@
         >
           <div class="input-group">
             <textarea
-              class="form-control"
-              id="commentContent"
-              name="content"
-              cols="6"
-              placeholder="댓글 작성하기"
-              maxlength="1000"
-              required
+                    class="form-control"
+                    id="commentContent"
+                    name="content"
+                    cols="6"
+                    placeholder="댓글 작성하기"
+                    maxlength="1000"
+                    required
             ></textarea>
             <button type="button" class="btn btn-primary" onclick="openPasswordModal()">업로드</button>
           </div>
@@ -142,7 +142,7 @@
                 class="dropdown-item text-danger btn btn-danger d-flex align-items-center gap-2"
                 data-bs-toggle="modal"
                 data-bs-target="#deleteArticleModal"
-                th:onclick="handleDeleteArticleButton(event, [[${article.id}]], [[${categoryId}]]);"
+                th:onclick="|handleDeleteArticleButton(event, [[${article.id}]], [[${categoryId}]]);|"
               >
                 <span class="material-symbols-outlined"> delete </span>삭제
               </button>
@@ -173,7 +173,11 @@
             ></button>
           </div>
           <div class="modal-body">
-            <p class="fw-light">게시글과 댓글이 삭제됩니다.</p>
+            <label for="delete-password" class="form-label">게시글과 댓글이 삭제됩니다. 비밀번호를 입력해주세요.</label>
+            <div class="input-group">
+              <input id="delete-password" type="text" class="form-control" placeholder="작성 글의 비밀번호를 입력해주세요." aria-label="Recipient's username" aria-describedby="button-addon2">
+              <button class="btn btn-outline-secondary" type="button" id="button-addon2" th:onclick="checkArticlePasswordIsCorrect([[${article.id}]])">제출</button>
+            </div>
           </div>
           <div class="modal-footer">
             <button
@@ -185,8 +189,10 @@
             </button>
             <button
               type="button"
+              id="delete-post"
               class="btn btn-danger"
               onclick="handleDeleteArticleModalButton()"
+              disabled
             >
               삭제
             </button>
@@ -268,13 +274,13 @@
                 method="POST">
             <div class="modal-body">
               <textarea
-                class="form-control"
-                name="content"
-                id="commentContentTextarea"
-                placeholder="댓글 수정하기..."
-                maxlength="1000"
-                required
-                th:text="${commentContent}"
+                      class="form-control"
+                      name="content"
+                      id="commentContentTextarea"
+                      placeholder="댓글 수정하기..."
+                      maxlength="1000"
+                      required
+                      th:text="${commentContent}"
               ></textarea>
 
               <!-- 오류 메세지 -->
@@ -379,7 +385,7 @@
 
       function handleDeleteArticleButton(_, postId, boardId) {
         currentArticle = postId;
-        currentBoard = boardId;
+        currentCategory = boardId;
       }
 
       function handleDeleteArticleModalButton() {

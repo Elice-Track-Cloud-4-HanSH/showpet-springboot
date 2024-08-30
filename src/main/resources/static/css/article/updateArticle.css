@@ -1,0 +1,21 @@
+html, body {
+    font-family: "Elice DX Neolli", sans-serif;
+}
+.icon-container {
+    position: relative; /* 부모 컨테이너를 상대적으로 배치합니다. */
+    display: inline-block; /* 필요에 따라 크기 조정 */
+}
+.icon-container img {
+    display: block; /* 이미지의 기본 블록 레벨 디스플레이 */
+}
+.icon-container .overlay {
+    position: absolute; /* 자식 요소를 절대적으로 배치합니다. */
+    top: 50px;
+    right: 50%;
+    width: 32px; /* 부모 요소에 맞추어 크기 조정 */
+    height: 32px; /* 부모 요소에 맞추어 크기 조정 */
+    z-index: 10; /* 오버레이를 다른 이미지 위로 이동 */
+    background-color: white;
+    cursor: pointer;
+    pointer-events: auto;
+}

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-    <html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
     <head>
         <meta charset="UTF-8" />
         <link
@@ -8,7 +8,7 @@
                 integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
                 crossorigin="anonymous"
         />
-        <link rel="stylesheet" href="https://font.elice.io/css?family=Elice+DX+Neolli"/>
+        <link rel="stylesheet" href="https://font.elice.io/css?family=Elice+DX+Neolli" />
         <link rel="stylesheet" href="/css/article/createArticle.css"/>
         <title>게시글 추가</title>
     </head>
@@ -22,17 +22,32 @@
                     method="post"
                     enctype="multipart/form-data"
             >
-                <div class="mb-3">
-                    <label for="title">게시글 제목</label>
-                    <input
-                            type="text"
-                            class="form-control"
-                            id="title"
-                            name="title"
-                            maxlength="200"
-                            placeholder="게시글 제목 입력 (최대 200자)"
-                            required
-                    />
+                <div class="mb-3 row">
+                    <div class="col-md-9">
+                        <label for="title">게시글 제목</label>
+                        <input
+                                type="text"
+                                class="form-control"
+                                id="title"
+                                name="title"
+                                maxlength="20-"
+                                placeholder="게시글 제목(최대 200자)"
+                                required
+                                autofocus
+                        />
+                    </div>
+                    <div class="col-md-3">
+                        <label for="password">게시글 비밀번호</label>
+                        <input
+                                type="password"
+                                class="form-control"
+                                id="password"
+                                name="anonPassword"
+                                maxlength="20"
+                                placeholder="비밀번호 입력"
+                                required
+                        />
+                    </div>
                 </div>
                 <div class="mb-3">
                     <label for="content">내용</label>
@@ -48,6 +63,7 @@
 
                 <div class="mb-3">
                     <label for="fileInput">이미지 업로드</label>
+
                     <input
                             type="file"
                             class="form-control"
@@ -57,7 +73,9 @@
                             onchange="showPreviewImage(this)"
                     />
                 </div>
+
                 <button type="submit" class="btn btn-primary">업로드</button>
+
                 <button
                         type="button"
                         class="btn btn-secondary"
@@ -69,8 +87,6 @@
                 <div class="mb-3 pt-5">
                     <img id="preview" src="#" alt="미리보기 이미지" style="display: none; max-width: 100%; height: auto;">
                 </div>
-
-
 
                 <input type="hidden" id="categoryId" name="categoryId" th:value="${categoryId}"/>
             </form>

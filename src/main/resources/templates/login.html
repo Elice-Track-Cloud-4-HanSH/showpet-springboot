@@ -135,14 +135,14 @@
         <p th:text="${errorMessage}"></p>
     </div>
 
-    <form th:action="@{/member/login}" th:object="${member}" method="post">
+    <form th:action="@{/member/login}" method="post">
         <div>
             <label for="username">Login ID:</label>
-            <input type="text" id="username" name="username" th:field="*{loginId}" required />
+            <input type="text" id="username" name="username" required />
         </div>
         <div>
             <label for="password">Password:</label>
-            <input type="password" id="password" name="password" th:field="*{loginPw}" required />
+            <input type="password" id="password" name="password" required />
         </div>
         <div>
             <button type="submit">Login</button>

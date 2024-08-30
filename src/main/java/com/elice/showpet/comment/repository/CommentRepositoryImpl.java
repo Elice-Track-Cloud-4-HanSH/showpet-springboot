@@ -63,10 +63,11 @@ public class CommentRepositoryImpl implements CommentRepository {
             jdbcTemplate.update(
                     connection -> {
                         PreparedStatement ps = connection.prepareStatement(insertSql, new String[]{"id"});
+                        LocalDateTime now = LocalDateTime.now();
                         ps.setString(1, comment.getContent());
                         ps.setString(2, comment.getPassword());
-                        ps.setObject(3, LocalDateTime.now());
-                        ps.setObject(4, LocalDateTime.now());
+                        ps.setObject(3, now);
+                        ps.setObject(4, now);
                         ps.setObject(5, comment.getArticle().getId());
                         return ps;
                     }, keyHolder);

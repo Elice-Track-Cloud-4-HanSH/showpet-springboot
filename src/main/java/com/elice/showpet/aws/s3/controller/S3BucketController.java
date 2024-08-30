@@ -21,14 +21,17 @@ public class S3BucketController {
       String fileUrl = s3BucketService.uploadFile(file);
       return new ResponseEntity<>(fileUrl, HttpStatus.OK);
     } catch (IOException e) {
-      e.printStackTrace();
       return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
   @DeleteMapping("/{filename}")
   public ResponseEntity<String> deleteBucket(@PathVariable("filename") String filename) {
-    s3BucketService.deleteFile(filename);
+    try {
+      s3BucketService.deleteFile(filename);
+    } catch (Exception e) {
+      return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
     return new ResponseEntity<>("Hello World!", HttpStatus.OK);
   }
 }

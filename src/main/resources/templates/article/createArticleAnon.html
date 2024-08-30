@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8" />
+        <link
+                href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+                rel="stylesheet"
+                integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+                crossorigin="anonymous"
+        />
+        <link rel="stylesheet" href="https://font.elice.io/css?family=Elice+DX+Neolli" />
+        <link rel="stylesheet" href="/css/article/createArticle.css"/>
+        <title>게시글 추가</title>
+    </head>
+    <body>
+        <div class="container my-5">
+            <div class="header mb-5">
+                <h1 class="text-center">게시글 추가</h1>
+            </div>
+            <form
+                    th:action="@{/articles/add}"
+                    method="post"
+                    enctype="multipart/form-data"
+            >
+                <div class="mb-3 row">
+                    <div class="col-md-9">
+                        <label for="title">게시글 제목</label>
+                        <input
+                                type="text"
+                                class="form-control"
+                                id="title"
+                                name="title"
+                                maxlength="20-"
+                                placeholder="게시글 제목(최대 200자)"
+                                required
+                                autofocus
+                        />
+                    </div>
+                    <div class="col-md-3">
+                        <label for="password">게시글 비밀번호</label>
+                        <input
+                                type="password"
+                                class="form-control"
+                                id="password"
+                                name="anonPassword"
+                                maxlength="20"
+                                placeholder="비밀번호 입력"
+                                required
+                        />
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="content">내용</label>
+                    <textarea
+                            class="form-control h-25"
+                            rows="15"
+                            id="content"
+                            name="content"
+                            maxlength="10000"
+                            placeholder="내용 입력 (최대 10000자)"
+                    ></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label for="fileInput">이미지 업로드</label>
+
+                    <input
+                            type="file"
+                            class="form-control"
+                            id="fileInput"
+                            name="file"
+                            accept="image/*"
+                            onchange="showPreviewImage(this)"
+                    />
+                </div>
+
+                <button type="submit" class="btn btn-primary">업로드</button>
+
+                <button
+                        type="button"
+                        class="btn btn-secondary"
+                        onclick="window.history.back();"
+                >
+                    취소
+                </button>
+
+                <div class="mb-3 pt-5">
+                    <img id="preview" src="#" alt="미리보기 이미지" style="display: none; max-width: 100%; height: auto;">
+                </div>
+
+                <input type="hidden" id="categoryId" name="categoryId" th:value="${categoryId}"/>
+            </form>
+        </div>
+
+        <!-- 부트스트랩 JS 추가 -->
+        <script
+                src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+                integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+                crossorigin="anonymous"
+        >
+        </script>
+        <script type="text/javascript" src="/js/article/createArticle.js"></script>
+    </body>
+</html>

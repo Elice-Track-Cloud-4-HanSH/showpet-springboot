@@ -7,8 +7,13 @@ import com.elice.showpet.category.dto.UpdateCategoryRequest;
 import com.elice.showpet.category.repository.CategoryRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,6 +33,7 @@ public class CategoryService {
         return categoryRepository.findAll();
     }
 
+
     public Category findById(long id) {
         return categoryRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("not found : " + id));
@@ -39,6 +45,11 @@ public class CategoryService {
 
     @Transactional
     public Category update(long id, UpdateCategoryRequest request) {
+//        try {
+//
+//        } catch (Exception e) {
+//            return "error";
+//        }
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("not found : " + id));
 
@@ -48,11 +59,15 @@ public class CategoryService {
                 .ifPresent(category::setContent);
         Optional.ofNullable(request.getImage())
                 .ifPresent((image) -> {
-                    s3BucketService.deleteFile(category.getImage().replace("https://showpet.s3.ap-northeast-2.amazonaws.com/", ""));
+                    Optional.ofNullable(category.getImage()).ifPresent(this::removeImage);
                     category.setImage(image);
                 });
         category.update(request.getTitle(), request.getContent());
 
         return category;
     }
+    public void removeImage(String image) {
+        s3BucketService.deleteFile(image);
+    }
 }
+

@@ -7,13 +7,15 @@ import java.util.Optional;
 
 public interface JdbcTemplateRepository {
 
-  List<Article> findAll();
+    List<Article> findAll();
 
-  List<Article> findPagenated(int categoryId, int page, int pageSize);
+    List<Article> findPagenated(int categoryId, int page, int pageSize);
 
-  Optional<Article> findById(Long id);
+    Optional<Article> findById(Long id);
 
-  Article save(Article article);
+    List<Article> search(int categoryId, String keyword, int page, int pageSize);
 
-  void delete(Article article);
+    Article save(Article article);
+
+    void delete(Article article);
 }

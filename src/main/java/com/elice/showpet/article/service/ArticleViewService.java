@@ -1,15 +1,20 @@
 package com.elice.showpet.article.service;
 
 import com.elice.showpet.article.entity.Article;
-import com.elice.showpet.article.entity.CreateArticleDto;
-import com.elice.showpet.article.entity.UpdateArticleDto;
-import com.elice.showpet.article.mapper.ArticleMapper;
+import com.elice.showpet.article.dto.CreateArticleDto;
+import com.elice.showpet.article.dto.UpdateArticleDto;
+import com.elice.showpet.comment.service.CommentViewService;
+import com.elice.showpet.common.exception.BucketFileNotDeletedException;
+import com.elice.showpet.common.exception.EntityNotFoundException;
 import com.elice.showpet.article.repository.ArticleJdbcTemplateRepository;
 import com.elice.showpet.article.repository.JdbcTemplateRepository;
 import com.elice.showpet.aws.s3.service.S3BucketService;
 import com.elice.showpet.category.entity.Category;
 import com.elice.showpet.category.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,73 +22,144 @@ import java.util.Optional;
 
 @Service
 public class ArticleViewService {
-  private final ArticleMapper articleMapper;
+    private final JdbcTemplateRepository articleRepository;
 
-  private final JdbcTemplateRepository articleRepository;
+    private final S3BucketService s3BucketService;
 
-  private final S3BucketService s3BucketService;
+    private final CategoryService categoryService;
 
-  private final CategoryService categoryService;
+    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-  @Autowired
-  public ArticleViewService(
-    ArticleMapper articleMapper,
-    ArticleJdbcTemplateRepository articleRepository,
-    S3BucketService s3BucketService,
-    CategoryService categoryService
-  ) {
-    this.articleMapper = articleMapper;
-    this.articleRepository = articleRepository;
-    this.s3BucketService = s3BucketService;
-    this.categoryService = categoryService;
-  }
+    private final CommentViewService commentViewService;
 
-  public List<Article> getAllArticles() {
-    return articleRepository.findAll();
-  }
+    private final int pageSize = 20;
 
-  public Article getArticle(Long id) throws Exception {
-    return articleRepository.findById(id).orElseThrow(() -> new Exception("Article not found"));
-  }
+    @Value("${spring.enabled.anon}")
+    private boolean isEnabledAnon;
 
-  public List<Article> getPagenatedArticles(int categoryId, int page, int pageSize) {
-    return articleRepository.findPagenated(categoryId, page, pageSize);
-  }
+    @Autowired
+    public ArticleViewService(
+            ArticleJdbcTemplateRepository articleRepository,
+            S3BucketService s3BucketService,
+            CategoryService categoryService,
+            CommentViewService commentViewService
+    ) {
+        this.articleRepository = articleRepository;
+        this.s3BucketService = s3BucketService;
+        this.categoryService = categoryService;
+        this.commentViewService = commentViewService;
+    }
 
-  public Article createArticle(CreateArticleDto articleDto) {
-    Article created = articleMapper.toEntity(articleDto);
-    Category category = categoryService.findById(articleDto.getCategoryId());
-    created.setCategory(category);
-    return articleRepository.save(created);
-  }
+    public boolean verifyPassword(Long articleId, String password) {
+        if (password == null) return false;
 
-  public Article updateArticle(Long id, UpdateArticleDto articleDto) throws Exception {
-    Article findArticle = getArticle(id);
+        Article article = this.getArticle(articleId);
+        return passwordEncoder.matches(password, article.getAnonPassword());
+    }
 
-    Optional.ofNullable(articleDto.getImageDeleted()).flatMap(_ -> Optional.ofNullable(findArticle.getImage())).ifPresent((str) -> {
-      removeImage(str);
-      findArticle.setImage(null);
-    });
-    Optional.ofNullable(articleDto.getTitle())
-      .ifPresent(findArticle::setTitle);
-    Optional.ofNullable(articleDto.getContent())
-      .ifPresent(findArticle::setContent);
-    Optional.ofNullable(articleDto.getImage())
-      .ifPresent((image) -> {
-        Optional.ofNullable(findArticle.getImage()).ifPresent(this::removeImage);
-        findArticle.setImage(image);
-      });
+    public String encryptPassword(String password) {
+        return passwordEncoder.encode(password);
+    }
 
-    return articleRepository.save(findArticle);
-  }
+    public List<Article> getAllArticles() {
+        return articleRepository.findAll();
+    }
 
-  public void deleteArticle(Long id) throws Exception {
-    Article article = getArticle(id);
-    articleRepository.delete(article);
-    removeImage(article.getImage());
-  }
+    public Article getArticle(Long id) throws EntityNotFoundException {
+        return articleRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Article not found"));
+    }
+    /**
+     * pageSize는 20으로 할게요!
+     * @param categoryId
+     * @param page
+     * @return 특정 게시판의 pagenated 된 게시글 목록을 가져옵니다.
+     */
+    public List<Article> getPagenatedArticles(Integer categoryId, Integer page) {
+        return articleRepository.findPagenated(categoryId, page, pageSize);
+    }
 
-  public void removeImage(String image) {
-    s3BucketService.deleteFile(image);
-  }
+    public Article createArticle(CreateArticleDto articleDto) {
+        if (articleDto.getAnonPassword() != null && isEnabledAnon) {
+            articleDto.setAnonPassword(encryptPassword(articleDto.getAnonPassword()));
+        }
+        Article created = articleDto.toEntity();
+        Category category = categoryService.findById(articleDto.getCategoryId());
+        created.setCategory(category);
+        return articleRepository.save(created);
+    }
+
+    public Article updateArticle(Long id, UpdateArticleDto articleDto) throws RuntimeException {
+        try {
+            Article findArticle = getArticle(id);
+            Optional.ofNullable(articleDto.getImageDeleted()).ifPresent((val) -> {
+                if (val.isEmpty()) return;
+                if (findArticle.getImage() == null || findArticle.getImage().isEmpty()) return;
+                try {
+                    removeImage(findArticle.getImage());
+                } catch (BucketFileNotDeletedException e) {
+                    throw new BucketFileNotDeletedException(e.getMessage());
+                }
+                findArticle.setImage(null);
+            });
+            Optional.ofNullable(articleDto.getTitle())
+                    .ifPresent(findArticle::setTitle);
+            Optional.ofNullable(articleDto.getContent())
+                    .ifPresent(findArticle::setContent);
+            Optional.ofNullable(articleDto.getImage())
+                    .ifPresent((image) -> {
+                        String findArticleImage = findArticle.getImage();
+                        if (findArticleImage != null) {
+                            try {
+                                removeImage(findArticleImage);
+                            } catch (RuntimeException e) {
+                                throw new RuntimeException(e.getMessage());
+                            }
+                        }
+                        findArticle.setImage(image);
+                    });
+
+            return articleRepository.save(findArticle);
+        } catch (EntityNotFoundException | BucketFileNotDeletedException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    public void deleteAllArticlesRelatedWithCategory(Integer categoryId) {
+        List<Article> articles = articleRepository.findPagenated(categoryId, 0, Integer.MAX_VALUE);
+        articles.forEach((article) -> {
+            deleteArticle(article.getId());
+        });
+    }
+
+    /**
+     * pageSize는 20으로 할게요!
+     * @param categoryId
+     * @param keyword
+     * @param page
+     * @return 해당 키워드를 가진 게시글 목록을 가져옵니다.
+     */
+    public List<Article> searchArticle(Integer categoryId, String keyword, int page) {
+        List<Article> articles = articleRepository.search(categoryId, keyword, page, pageSize);
+        return articles;
+    }
+
+    public Long deleteArticle(Long id) throws RuntimeException {
+        try {
+            Article article = getArticle(id);
+            removeImage(article.getImage());
+            commentViewService.deleteAllComments(id);
+            articleRepository.delete(article);
+            return article.getCategory().getId();
+        } catch (EntityNotFoundException | BucketFileNotDeletedException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    public void removeImage(String image) throws BucketFileNotDeletedException {
+        try {
+            s3BucketService.deleteFile(image);
+        } catch (Exception e) {
+            throw new BucketFileNotDeletedException("S3 버킷에서 이미지가 삭제되지 않았습니다.");
+        }
+    }
 }

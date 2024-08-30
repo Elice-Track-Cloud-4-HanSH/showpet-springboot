@@ -26,6 +26,9 @@ public class Comment {
   @Column(nullable = false, length = 1000)
   private String content;
 
+  @Column(length = 10)
+  private String password;
+
   @CreatedDate
   private LocalDateTime createdAt;
 

@@ -15,14 +15,14 @@ import org.springframework.stereotype.Component;
 
 import org.springframework.security.core.userdetails.UserDetailsService;
 
-@Component
 public class CustomAuthenticationProvider implements AuthenticationProvider {
 
     private final UserDetailsService userDetailsService;
-    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final PasswordEncoder passwordEncoder;
 
-    public CustomAuthenticationProvider(UserDetailsService userDetailsService) {
+    public CustomAuthenticationProvider(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
         this.userDetailsService = userDetailsService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -32,14 +32,15 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         String password = (String) authentication.getCredentials();
 
         // 사용자 정보 가져오기
-        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
-        // 비밀번호 확인
-        if (!passwordEncoder.matches(password, userDetails.getPassword())) {
-            throw new BadCredentialsException("Invalid credentials");
+        UserDetails user = userDetailsService.loadUserByUsername(username);
+        if(user == null){
+            throw new BadCredentialsException("username is not found. username=" + username);
         }
-
-        return new UsernamePasswordAuthenticationToken(username, password, userDetails.getAuthorities());
+        // 비밀번호 확인
+        if (!this.passwordEncoder.matches(password, user.getPassword())) {
+            throw new BadCredentialsException("Password is not matched");
+        }
+        return new UsernamePasswordAuthenticationToken(username, password, user.getAuthorities());
     }
 
     @Override

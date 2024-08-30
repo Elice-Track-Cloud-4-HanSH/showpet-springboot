@@ -1,6 +1,10 @@
 spring:
   application:
     name: showpet
+  config:
+    import:
+      - s3bucket.yaml
+      - application-security.yaml
 
   h2:
     console:
@@ -27,7 +31,3 @@ spring:
     multipart:
       max-file-size: 50MB
       max-request-size: 50MB
-
-  config:
-    import:
-      - s3bucket.yaml

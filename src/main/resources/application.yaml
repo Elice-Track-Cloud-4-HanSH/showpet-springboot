@@ -1,10 +1,6 @@
 spring:
   application:
     name: showpet
-  config:
-    import:
-      - s3bucket.yaml
-      - application-security.yaml
 
   h2:
     console:
